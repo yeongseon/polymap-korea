@@ -98,13 +98,6 @@ export function getCandidacyClaims(id: string): Promise<ClaimRead[]> {
   return apiFetch<ClaimRead[]>(`/candidacies/${id}/claims`);
 }
 
-export function getBallotByDistrict(districtId: string): Promise<BallotResolveResponse> {
-  return apiFetch<BallotResolveResponse>("/ballots/resolve", {
-    method: "POST",
-    body: JSON.stringify({ address_text: districtId }),
-  });
-}
-
 export function getCandidaciesByDistrict(
   districtId: string
 ): Promise<CandidacySummary[]> {

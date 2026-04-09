@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearch } from "@/lib/hooks";
 import type { IssueSummary, PartySummary, PersonSummary } from "@/lib/types";
 
@@ -14,6 +14,22 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: "issues", label: "이슈" },
   { key: "parties", label: "정당" },
 ];
+
+const URL_TYPE_TO_TAB: Record<string, TabKey> = {
+  persons: "persons",
+  person: "persons",
+  issues: "issues",
+  issue: "issues",
+  parties: "parties",
+  party: "parties",
+};
+
+const TAB_TO_API_TYPE: Record<TabKey, string | undefined> = {
+  all: undefined,
+  persons: "persons",
+  issues: "issues",
+  parties: "parties",
+};
 
 function PersonItem({ person }: { person: PersonSummary }) {
   return (
@@ -69,20 +85,43 @@ function SearchContent() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const initialQ = searchParams.get("q") ?? "";
+  const urlType = searchParams.get("type") ?? "";
+  const initialTab = URL_TYPE_TO_TAB[urlType] ?? "all";
+
   const [input, setInput] = useState(initialQ);
-  const [activeTab, setActiveTab] = useState<TabKey>("all");
+  const [activeTab, setActiveTab] = useState<TabKey>(initialTab);
 
   useEffect(() => {
     setInput(initialQ);
   }, [initialQ]);
 
-  const { data, isFetching, isError } = useSearch(initialQ);
+  useEffect(() => {
+    setActiveTab(URL_TYPE_TO_TAB[urlType] ?? "all");
+  }, [urlType]);
+
+  const apiType = TAB_TO_API_TYPE[activeTab];
+  const { data, isFetching, isError } = useSearch(initialQ, apiType);
+
+  const updateUrl = useCallback(
+    (q: string, type?: string) => {
+      const params = new URLSearchParams();
+      if (q) params.set("q", q);
+      if (type && type !== "all") params.set("type", type);
+      router.push(`${pathname}?${params.toString()}`);
+    },
+    [router, pathname]
+  );
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("q", input.trim());
-    router.push(`${pathname}?${params.toString()}`);
+    updateUrl(input.trim(), activeTab === "all" ? undefined : activeTab);
+  }
+
+  function handleTabChange(tab: TabKey) {
+    setActiveTab(tab);
+    if (initialQ) {
+      updateUrl(initialQ, tab === "all" ? undefined : tab);
+    }
   }
 
   const persons = data?.persons ?? [];
@@ -124,7 +163,7 @@ function SearchContent() {
             {TABS.map(({ key, label }) => (
               <button
                 key={key}
-                onClick={() => setActiveTab(key)}
+                onClick={() => handleTabChange(key)}
                 className={`px-4 py-2 text-sm font-semibold transition ${
                   activeTab === key
                     ? "border-b-2 border-blue-600 text-blue-600"
