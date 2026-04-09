@@ -131,9 +131,23 @@ def downgrade() -> None:
                 batch_op.drop_column("visibility")
 
     if _has_table(inspector, "audit_log"):
-        op.drop_index("ix_audit_log_entity_lookup", table_name="audit_log")
-        op.drop_index("ix_audit_log_created_at", table_name="audit_log")
-        op.drop_table("audit_log")
+        audit_log_columns = _column_names(inspector, "audit_log")
+        with op.batch_alter_table("audit_log") as batch_op:
+            if "legal_basis" in audit_log_columns:
+                batch_op.drop_column("legal_basis")
+            if "new_value" in audit_log_columns:
+                batch_op.drop_column("new_value")
+            if "old_value" in audit_log_columns:
+                batch_op.drop_column("old_value")
+            if "reason_code" in audit_log_columns:
+                batch_op.drop_column("reason_code")
 
     if _has_table(inspector, "election_window"):
-        op.drop_table("election_window")
+        election_window_columns = _column_names(inspector, "election_window")
+        with op.batch_alter_table("election_window") as batch_op:
+            if "blackout_end" in election_window_columns:
+                batch_op.drop_column("blackout_end")
+            if "blackout_start" in election_window_columns:
+                batch_op.drop_column("blackout_start")
+            if "content_type" in election_window_columns:
+                batch_op.drop_column("content_type")
