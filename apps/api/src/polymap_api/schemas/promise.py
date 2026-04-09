@@ -5,11 +5,11 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, model_validator
 
 
 class PromiseBase(BaseModel):
-    model_config = ConfigDict(extra="ignore")
+    model_config = ConfigDict(extra="ignore", populate_by_name=True)
 
     candidacy_id: UUID
     title: str = Field(min_length=1, max_length=300)
@@ -18,6 +18,11 @@ class PromiseBase(BaseModel):
     issue_id: UUID | None = None
     source_doc_id: UUID | None = None
     sort_order: int = 0
+    metadata_: dict[str, Any] | None = Field(
+        default=None,
+        serialization_alias="metadata",
+        validation_alias=AliasChoices("metadata_", "metadata"),
+    )
 
     @model_validator(mode="before")
     @classmethod

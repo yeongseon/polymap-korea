@@ -1,0 +1,88 @@
+@prefix pm: <http://polymap.kr/ontology#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+pm:economy a pm:Issue ;
+    skos:prefLabel "경제"@ko ;
+    skos:narrower pm:economy-jobs, pm:economy-housing, pm:economy-smallbiz .
+
+pm:economy-jobs a pm:Issue ;
+    skos:prefLabel "일자리"@ko ;
+    skos:broader pm:economy .
+
+pm:economy-housing a pm:Issue ;
+    skos:prefLabel "주거·부동산"@ko ;
+    skos:broader pm:economy .
+
+pm:economy-smallbiz a pm:Issue ;
+    skos:prefLabel "소상공인·자영업"@ko ;
+    skos:broader pm:economy .
+
+pm:welfare a pm:Issue ;
+    skos:prefLabel "복지"@ko ;
+    skos:narrower pm:welfare-elderly, pm:welfare-childcare, pm:welfare-disability .
+
+pm:welfare-elderly a pm:Issue ;
+    skos:prefLabel "노인 복지"@ko ;
+    skos:broader pm:welfare .
+
+pm:welfare-childcare a pm:Issue ;
+    skos:prefLabel "보육·육아"@ko ;
+    skos:broader pm:welfare .
+
+pm:welfare-disability a pm:Issue ;
+    skos:prefLabel "장애인 복지"@ko ;
+    skos:broader pm:welfare .
+
+pm:education a pm:Issue ;
+    skos:prefLabel "교육"@ko ;
+    skos:narrower pm:education-public, pm:education-lifelong .
+
+pm:education-public a pm:Issue ;
+    skos:prefLabel "공교육"@ko ;
+    skos:broader pm:education .
+
+pm:education-lifelong a pm:Issue ;
+    skos:prefLabel "평생교육"@ko ;
+    skos:broader pm:education .
+
+pm:environment a pm:Issue ;
+    skos:prefLabel "환경"@ko ;
+    skos:narrower pm:environment-climate, pm:environment-waste .
+
+pm:environment-climate a pm:Issue ;
+    skos:prefLabel "기후·에너지"@ko ;
+    skos:broader pm:environment .
+
+pm:environment-waste a pm:Issue ;
+    skos:prefLabel "폐기물·재활용"@ko ;
+    skos:broader pm:environment .
+
+pm:transport a pm:Issue ;
+    skos:prefLabel "교통"@ko ;
+    skos:narrower pm:transport-public, pm:transport-road .
+
+pm:transport-public a pm:Issue ;
+    skos:prefLabel "대중교통"@ko ;
+    skos:broader pm:transport .
+
+pm:transport-road a pm:Issue ;
+    skos:prefLabel "도로·주차"@ko ;
+    skos:broader pm:transport .
+
+pm:safety a pm:Issue ;
+    skos:prefLabel "안전"@ko ;
+    skos:narrower pm:safety-disaster, pm:safety-crime .
+
+pm:safety-disaster a pm:Issue ;
+    skos:prefLabel "재난·방재"@ko ;
+    skos:broader pm:safety .
+
+pm:safety-crime a pm:Issue ;
+    skos:prefLabel "치안·범죄예방"@ko ;
+    skos:broader pm:safety .
+
+pm:culture a pm:Issue ;
+    skos:prefLabel "문화·관광"@ko .
+
+pm:administration a pm:Issue ;
+    skos:prefLabel "행정·자치"@ko .
