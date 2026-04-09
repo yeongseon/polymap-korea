@@ -6,11 +6,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from prefect import flow, task
+
 logger = logging.getLogger(__name__)
 
 DEFAULT_SNAPSHOT_DIR = Path("snapshots")
 
 
+@task
 def collect_curated_data() -> dict[str, Any]:
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -27,6 +30,7 @@ def collect_curated_data() -> dict[str, Any]:
     }
 
 
+@task
 def write_snapshot(data: dict[str, Any], output_dir: Path) -> Path:
     output_dir.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
@@ -36,7 +40,10 @@ def write_snapshot(data: dict[str, Any], output_dir: Path) -> Path:
     return file_path
 
 
-def publish_snapshot(output_dir: Path | None = None) -> dict[str, str]:
+@flow(name="publish-snapshot")
+def publish_snapshot(
+    output_dir: Path | None = None,
+) -> dict[str, str]:
     if output_dir is None:
         output_dir = DEFAULT_SNAPSHOT_DIR
     data = collect_curated_data()
