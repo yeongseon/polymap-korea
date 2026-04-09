@@ -1,0 +1,14 @@
+name: polymap-korea-pipeline
+prefect-version: 3.1.0
+
+build: []
+push: []
+pull: []
+
+deployments:
+  - name: nec-snapshot
+    version: 0.1.0
+    description: Capture raw NEC source snapshots.
+    entrypoint: publish/snapshot.py:publish_snapshot_flow
+    work_pool:
+      name: default-agent-pool

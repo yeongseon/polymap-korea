@@ -1,0 +1,9 @@
+{
+  "name": "polymap-korea",
+  "private": true,
+  "scripts": {
+    "dev:web": "pnpm --filter web dev",
+    "build:web": "pnpm --filter web build",
+    "lint:web": "pnpm --filter web lint"
+  }
+}

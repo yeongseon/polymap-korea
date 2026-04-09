@@ -1,0 +1,26 @@
+{
+  "typeCheckingMode": "basic",
+  "reportMissingImports": false,
+  "reportMissingModuleSource": false,
+  "reportUnknownVariableType": false,
+  "reportUnknownArgumentType": false,
+  "reportUnknownMemberType": false,
+  "reportUnknownLambdaType": false,
+  "reportUnknownParameterType": false,
+  "reportUnannotatedClassAttribute": false,
+  "reportUnusedCallResult": false,
+  "reportUntypedFunctionDecorator": false,
+  "reportImplicitOverride": false,
+  "reportAny": false,
+  "reportExplicitAny": false,
+  "executionEnvironments": [
+    {
+      "root": "apps/api",
+      "extraPaths": ["src"]
+    },
+    {
+      "root": "pipeline",
+      "extraPaths": ["."]
+    }
+  ]
+}

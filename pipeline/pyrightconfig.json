@@ -1,0 +1,7 @@
+{
+  "include": ["common", "normalization", "publish", "sources", "tests"],
+  "extraPaths": ["."],
+  "typeCheckingMode": "basic",
+  "reportMissingImports": false,
+  "reportMissingModuleSource": false
+}
