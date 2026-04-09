@@ -4,7 +4,7 @@ help:
 	@echo "폴리맵 코리아 개발 명령어"
 	@echo ""
 	@echo "  make setup        - 전체 개발 환경 설정"
-	@echo "  make dev-infra    - 인프라 서비스 시작 (PostgreSQL, MinIO)"
+	@echo "  make dev-infra    - core 프로파일 시작 (PostgreSQL, MinIO, Prefect, API, Web, Pipeline)"
 	@echo "  make dev-search   - 검색 서비스 추가 시작 (OpenSearch)"
 	@echo "  make api          - API 서버 시작"
 	@echo "  make web          - 웹 프론트엔드 시작"
