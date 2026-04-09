@@ -1,5 +1,5 @@
 {
   "include": ["src", "tests"],
-  "extraPaths": ["src"],
+  "extraPaths": ["src", "../../packages/ontology/src"],
   "typeCheckingMode": "basic"
 }
