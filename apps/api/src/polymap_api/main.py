@@ -4,7 +4,7 @@ from __future__ import annotations
 from fastapi import FastAPI
 
 from .config import settings
-from .routers import ballots, candidacies, compare, districts, elections, issues, persons, search, sources, sse
+from .routers import ballots, candidacies, compare, compliance, districts, elections, issues, persons, search, sources, sse
 
 app = FastAPI(
     title="PolyMap Korea API",
@@ -32,3 +32,4 @@ app.include_router(sources.router, prefix="/api/v1")
 app.include_router(search.router, prefix="/api/v1")
 app.include_router(compare.router, prefix="/api/v1")
 app.include_router(sse.router, prefix="/api/v1")
+app.include_router(compliance.router, prefix="/api/v1")
