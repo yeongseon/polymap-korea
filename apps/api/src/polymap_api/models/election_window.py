@@ -5,8 +5,10 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
+from zoneinfo import ZoneInfo
+
 from sqlalchemy import CheckConstraint, DateTime, ForeignKey, String
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 
 from polymap_api.db import Base, TimestampMixin, UUIDPrimaryKeyMixin
 
@@ -30,6 +32,8 @@ class ElectionWindow(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 
     election: Mapped[Election] = relationship(back_populates="windows")
 
+    _SEOUL_TZ = ZoneInfo("Asia/Seoul")
+
     def __init__(self, **kwargs: Any) -> None:
         phase = kwargs.pop("phase", None)
         starts_at = kwargs.pop("starts_at", None)
@@ -43,3 +47,9 @@ class ElectionWindow(UUIDPrimaryKeyMixin, TimestampMixin, Base):
             kwargs["blackout_end"] = ends_at
 
         super().__init__(**kwargs)
+
+    @validates("blackout_start", "blackout_end")
+    def _normalize_blackout_datetime(self, _: str, value: datetime) -> datetime:
+        if value.tzinfo is None:
+            return value.replace(tzinfo=self._SEOUL_TZ)
+        return value.astimezone(self._SEOUL_TZ)
