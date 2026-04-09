@@ -1,11 +1,17 @@
 # ruff: noqa: I001,E501,SIM118
 from __future__ import annotations
 
+import uuid
+from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
+
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.sql.schema import Table
 
 from polymap_api.db import Base
-from polymap_api.models import AuditLog, Candidacy, Claim, District, Issue, IssueRelation, Party, Person, Promise, SourceDoc
+from polymap_api.models import AuditLog, Candidacy, Claim, District, ElectionWindow, Issue, IssueRelation, Party, Person, Promise, SourceDoc
+
+SEOUL_TZ = ZoneInfo("Asia/Seoul")
 
 
 def test_all_expected_tables_registered() -> None:
@@ -102,3 +108,17 @@ def test_soft_delete_scope_matches_oracle_approval() -> None:
     assert "deleted_at" in Person.__table__.columns.keys()
     assert "deleted_at" in Party.__table__.columns.keys()
     assert "deleted_at" in SourceDoc.__table__.columns.keys()
+
+
+def test_election_window_normalizes_blackout_datetimes_to_seoul() -> None:
+    window = ElectionWindow(
+        id=uuid.uuid4(),
+        election_id=uuid.uuid4(),
+        content_type="poll_result",
+        blackout_start=datetime(2026, 6, 2, 9, 0, 0),
+        blackout_end=datetime(2026, 6, 2, 3, 0, 0, tzinfo=timezone.utc),
+    )
+
+    assert window.blackout_start.tzinfo == SEOUL_TZ
+    assert window.blackout_end.tzinfo == SEOUL_TZ
+    assert window.blackout_end.hour == 12

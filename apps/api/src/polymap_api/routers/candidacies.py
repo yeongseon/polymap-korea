@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from polymap_api.deps import Pagination, get_db, get_pagination
+from polymap_api.middleware.content_guard import ensure_content_visible, is_content_blocked
 from polymap_api.models import Candidacy, Claim, Promise, Race
 from polymap_api.schemas import (
     CandidacySummary,
@@ -59,6 +60,18 @@ async def _get_candidacy_or_404(candidacy_id: UUID, db: AsyncSession) -> Candida
     return candidacy
 
 
+async def require_poll_result_visibility_for_claims(
+    candidacy_id: UUID,
+    db: AsyncSession = Depends(get_db),
+) -> None:
+    election_id = await db.scalar(
+        select(Race.election_id).join(Candidacy, Candidacy.race_id == Race.id).where(Candidacy.id == candidacy_id)
+    )
+    if election_id is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Candidacy not found")
+    await ensure_content_visible(content_type="poll_result", election_id=election_id, db=db)
+
+
 @router.get("", response_model=list[CandidacySummary])
 async def list_candidacies(
     election_id: UUID | None = Query(default=None),
@@ -84,8 +97,16 @@ async def list_candidacies(
 
 
 @router.get("/{candidacy_id}", response_model=CandidacyDetail)
-async def get_candidacy(candidacy_id: UUID, db: AsyncSession = Depends(get_db)) -> Candidacy:
-    return await _get_candidacy_or_404(candidacy_id, db)
+async def get_candidacy(candidacy_id: UUID, db: AsyncSession = Depends(get_db)) -> Candidacy | dict[str, object]:
+    candidacy = await _get_candidacy_or_404(candidacy_id, db)
+    election_id = await db.scalar(select(Race.election_id).where(Race.id == candidacy.race_id))
+    if election_id is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Candidacy not found")
+    if await is_content_blocked("poll_result", election_id, db):
+        response = CandidacyDetail.model_validate(candidacy).model_dump()
+        response["claims"] = []
+        return response
+    return candidacy
 
 
 @router.get("/{candidacy_id}/promises", response_model=list[PromiseRead])
@@ -101,7 +122,11 @@ async def list_candidacy_promises(candidacy_id: UUID, db: AsyncSession = Depends
 
 
 @router.get("/{candidacy_id}/claims", response_model=list[ClaimRead])
-async def list_candidacy_claims(candidacy_id: UUID, db: AsyncSession = Depends(get_db)) -> list[Claim]:
+async def list_candidacy_claims(
+    candidacy_id: UUID,
+    _: None = Depends(require_poll_result_visibility_for_claims),
+    db: AsyncSession = Depends(get_db),
+) -> list[Claim]:
     await _get_candidacy_or_404(candidacy_id, db)
     statement = select(Claim).where(Claim.candidacy_id == candidacy_id).order_by(Claim.created_at.asc())
     result = await db.scalars(statement)
