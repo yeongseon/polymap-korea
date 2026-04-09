@@ -4,7 +4,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Enum, String
+from sqlalchemy import DateTime, Enum, String, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from polymap_api.db import Base, SoftDeleteMixin, TimestampMixin, UUIDPrimaryKeyMixin
@@ -24,6 +24,8 @@ class SourceDoc(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
     title: Mapped[str] = mapped_column(String(300), nullable=False)
     url: Mapped[str | None] = mapped_column(String(1000), nullable=True)
     published_at: Mapped[datetime | None] = mapped_column(nullable=True)
+    visibility: Mapped[str] = mapped_column(String(20), nullable=False, server_default=text("'VISIBLE'"))
+    public_expiry_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     content_hash: Mapped[str | None] = mapped_column(String(128), nullable=True)
     raw_s3_key: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
