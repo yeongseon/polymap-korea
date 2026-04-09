@@ -28,6 +28,9 @@ class TokenBucketRateLimiter:
         if tokens <= 0:
             msg = "tokens must be positive"
             raise ValueError(msg)
+        if tokens > self.capacity:
+            msg = f"tokens ({tokens}) exceeds capacity ({self.capacity})"
+            raise ValueError(msg)
 
         while True:
             async with self._lock:

@@ -1,6 +1,11 @@
+from __future__ import annotations
+
+from pathlib import Path
 from typing import ClassVar
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+_PROJECT_ROOT = Path(__file__).resolve().parents[4]
 
 
 class Settings(BaseSettings):
@@ -19,7 +24,7 @@ class Settings(BaseSettings):
 
     model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
         env_prefix="POLYMAP_",
-        env_file=".env",
+        env_file=str(_PROJECT_ROOT / ".env"),
     )
 
 

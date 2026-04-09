@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -24,7 +25,10 @@ class RawRecord:
     data: dict[str, Any] | str = field(default_factory=dict)
 
     def compute_hash(self) -> str:
-        content = str(self.data).encode("utf-8")
+        if isinstance(self.data, dict):
+            content = json.dumps(self.data, sort_keys=True, ensure_ascii=False).encode("utf-8")
+        else:
+            content = self.data.encode("utf-8")
         self.response_hash = hashlib.sha256(content).hexdigest()
         return self.response_hash
 

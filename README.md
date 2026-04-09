@@ -14,18 +14,17 @@
 
 ## 설계 원칙
 
-- **사실/주장/AI요약 3층 분리** — Official Fact · Claim · LLM Summary
+- **사실/주장/AI요약 3층 분리** — Official Fact · Sourced Claim · AI Summary
 - **출처가 보이는 근거 패널** — 모든 정보에 provenance 부착
-- **ORG/PROV/SHACL 호환** — W3C 표준 기반 온톨로지
 - **선거법 안전장치** — 여론조사 금지기간, 후보자료 공개시한, 딥페이크 규제 준수
 
 ## 아키텍처
 
 ```
-[Source Adapters] → [Raw Archive (S3)] → [Parser/Extractor] → [Normalizer]
-    → [Entity Resolver] → [Validation (SHACL)] → [Curated Warehouse (PostgreSQL)]
-    → [Graph Store (Neo4j)] → [Search Index (OpenSearch)] → [Public API (FastAPI/GraphQL)]
-    → [Frontend (Next.js)]
+[Source Adapters] → [Raw Archive (S3/MinIO)] → [Parser/Extractor] → [Normalizer]
+    → [Entity Resolver] → [Validation (Pydantic/SQL CHECK)]
+    → [Curated Warehouse (PostgreSQL)] → [Search Index (OpenSearch)]
+    → [REST API (FastAPI)] → [Frontend (Next.js 14)]
 ```
 
 ## 데이터 원천
@@ -42,11 +41,22 @@
 
 ## 기술 스택
 
-- **수집/ETL**: Python, Prefect, Playwright
-- **저장**: PostgreSQL (curated), Neo4j (graph), OpenSearch (search), S3 (raw)
-- **API**: FastAPI + Strawberry GraphQL
-- **Frontend**: Next.js 14 + TypeScript + D3.js/Cytoscape.js
-- **Infra**: Docker Compose → K8s, Redis, OpenTelemetry
+- **수집/ETL**: Python, Prefect
+- **저장**: PostgreSQL (curated), OpenSearch (search), MinIO (raw archive)
+- **API**: FastAPI (REST + OpenAPI)
+- **Frontend**: Next.js 14 + TypeScript + Cytoscape.js
+- **Infra**: Docker Compose, Redis
+
+## 개발 환경
+
+```bash
+make setup      # 의존성 설치 (uv, pnpm)
+make dev-infra  # 인프라 서비스 시작 (PostgreSQL, Redis, MinIO)
+make api        # API 서버 시작
+make web        # 웹 프론트엔드 시작
+make test       # 전체 테스트 실행
+make lint       # 전체 린트 실행
+```
 
 ## 선거 일정 (2026)
 
@@ -61,7 +71,3 @@
 ## 라이선스
 
 MIT License
-
-## 기여
-
-이슈와 PR을 환영합니다. [CONTRIBUTING.md](CONTRIBUTING.md)를 참고하세요.

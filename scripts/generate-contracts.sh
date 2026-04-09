@@ -7,15 +7,17 @@ API_DIR="$ROOT_DIR/apps/api"
 OPENAPI_FILE="$API_DIR/openapi.json"
 OUTPUT_FILE="$ROOT_DIR/packages/contracts/src/index.ts"
 
-if ! command -v pnpm >/dev/null 2>&1; then
-  printf 'pnpm is required to generate contracts\n' >&2
-  exit 1
-fi
+for cmd in pnpm uv; do
+  if ! command -v "$cmd" >/dev/null 2>&1; then
+    printf '%s is required to generate contracts\n' "$cmd" >&2
+    exit 1
+  fi
+done
 
 mkdir -p "$(dirname "$OUTPUT_FILE")"
 
 (cd "$API_DIR" && uv run python -c 'import json; from polymap_api.main import app; print(json.dumps(app.openapi(), ensure_ascii=False, indent=2))' > "$OPENAPI_FILE")
 
-(cd "$ROOT_DIR" && pnpm dlx openapi-typescript "$OPENAPI_FILE" --output "$OUTPUT_FILE")
+(cd "$ROOT_DIR" && pnpm dlx openapi-typescript@7.6.1 "$OPENAPI_FILE" --output "$OUTPUT_FILE")
 
 printf 'Generated TypeScript contracts at %s\n' "$OUTPUT_FILE"
