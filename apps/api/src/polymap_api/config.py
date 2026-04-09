@@ -6,6 +6,7 @@ from typing import ClassVar
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 _PROJECT_ROOT = Path(__file__).resolve().parents[4]
+AI_DISCLAIMER_KO = "이 요약은 중앙선거관리위원회 등 원문 자료를 바탕으로 인공지능이 생성한 참고용 요약입니다. 원문과 차이가 있을 수 있으므로 출처 문서를 함께 확인하세요."
 
 
 class Settings(BaseSettings):
