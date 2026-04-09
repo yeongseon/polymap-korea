@@ -8,7 +8,7 @@ from normalization.issues import classify_promise
 TAXONOMY_JSON = Path(__file__).resolve().parents[1] / "taxonomy" / "taxonomy.json"
 
 
-def _load_taxonomy_slugs() -> set[str]:
+def _load_classifiable_slugs() -> set[str]:
     with open(TAXONOMY_JSON, encoding="utf-8") as f:
         taxonomy = json.load(f)
     slugs: set[str] = set()
@@ -19,6 +19,17 @@ def _load_taxonomy_slugs() -> set[str]:
                 slugs.add(child["slug"])
         else:
             slugs.add(parent["slug"])
+    return slugs
+
+
+def _load_all_taxonomy_slugs() -> set[str]:
+    with open(TAXONOMY_JSON, encoding="utf-8") as f:
+        taxonomy = json.load(f)
+    slugs: set[str] = set()
+    for parent in taxonomy:
+        slugs.add(parent["slug"])
+        for child in parent.get("children", []):
+            slugs.add(child["slug"])
     return slugs
 
 
@@ -44,17 +55,44 @@ def test_classify_promise_returns_empty_list_without_keyword_hits() -> None:
     assert classify_promise("디지털 전환", "혁신적인 미래 전략") == []
 
 
-def test_issue_keywords_match_taxonomy_json() -> None:
+def test_issue_keywords_match_classifiable_slugs() -> None:
     from normalization.issues.rules import ISSUE_KEYWORDS
 
-    taxonomy_slugs = _load_taxonomy_slugs()
+    classifiable = _load_classifiable_slugs()
     keyword_slugs = set(ISSUE_KEYWORDS.keys())
 
-    assert taxonomy_slugs == keyword_slugs, (
-        f"taxonomy.json vs ISSUE_KEYWORDS mismatch — "
-        f"missing: {sorted(taxonomy_slugs - keyword_slugs)}, "
-        f"extra: {sorted(keyword_slugs - taxonomy_slugs)}"
+    assert classifiable == keyword_slugs, (
+        f"taxonomy.json classifiable slugs vs ISSUE_KEYWORDS mismatch — "
+        f"missing: {sorted(classifiable - keyword_slugs)}, "
+        f"extra: {sorted(keyword_slugs - classifiable)}"
     )
+
+
+def test_all_taxonomy_slugs_exported() -> None:
+    from normalization.issues.rules import ALL_TAXONOMY_SLUGS
+
+    expected = _load_all_taxonomy_slugs()
+    assert expected == set(ALL_TAXONOMY_SLUGS), (
+        f"ALL_TAXONOMY_SLUGS mismatch — "
+        f"missing: {sorted(expected - ALL_TAXONOMY_SLUGS)}, "
+        f"extra: {sorted(ALL_TAXONOMY_SLUGS - expected)}"
+    )
+
+
+def test_classifiable_slugs_are_subset_of_all_slugs() -> None:
+    all_slugs = _load_all_taxonomy_slugs()
+    classifiable = _load_classifiable_slugs()
+    assert classifiable.issubset(all_slugs)
+
+    parent_only = all_slugs - classifiable
+    for parent_slug in parent_only:
+        with open(TAXONOMY_JSON, encoding="utf-8") as f:
+            taxonomy = json.load(f)
+        for entry in taxonomy:
+            if entry["slug"] == parent_slug:
+                assert len(entry.get("children", [])) > 0, (
+                    f"{parent_slug} excluded from classifiable but has no children"
+                )
 
 
 def test_ttl_is_generated_from_taxonomy_json() -> None:

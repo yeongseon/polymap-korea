@@ -113,6 +113,56 @@ async def _seed_issues(conn: AsyncConnection) -> dict[str, UUID]:
     return issue_ids
 
 
+def _canonical_edges(
+    taxonomy: list[dict[str, object]], issue_ids: dict[str, UUID],
+) -> set[tuple[UUID, UUID, IssueRelationType]]:
+    edges: set[tuple[UUID, UUID, IssueRelationType]] = set()
+    for parent in taxonomy:
+        parent_id = issue_ids[str(parent["slug"])]
+        children = parent.get("children", [])
+        assert isinstance(children, list)
+        for child in children:
+            child_id = issue_ids[str(child["slug"])]
+            edges.add((child_id, parent_id, IssueRelationType.BROADER))
+            edges.add((parent_id, child_id, IssueRelationType.NARROWER))
+    return edges
+
+
+async def _reconcile_relations(
+    conn: AsyncConnection,
+    canonical: set[tuple[UUID, UUID, IssueRelationType]],
+) -> None:
+    rows = await conn.execute(
+        select(
+            issue_relation_table.c.id,
+            issue_relation_table.c.source_issue_id,
+            issue_relation_table.c.target_issue_id,
+            issue_relation_table.c.relation_type,
+        )
+    )
+    existing: dict[tuple[UUID, UUID, IssueRelationType], UUID] = {}
+    for row in rows.all():
+        key = (row.source_issue_id, row.target_issue_id, row.relation_type)
+        existing[key] = row.id
+
+    stale_keys = set(existing.keys()) - canonical
+    for key in stale_keys:
+        await conn.execute(
+            issue_relation_table.delete().where(issue_relation_table.c.id == existing[key])
+        )
+
+    missing_keys = canonical - set(existing.keys())
+    for src, tgt, rel in missing_keys:
+        await conn.execute(
+            issue_relation_table.insert().values(
+                id=uuid4(),
+                source_issue_id=src,
+                target_issue_id=tgt,
+                relation_type=rel,
+            )
+        )
+
+
 async def seed_taxonomy() -> None:
     database_url = os.environ.get("DATABASE_URL")
     if not database_url:
@@ -123,41 +173,10 @@ async def seed_taxonomy() -> None:
     try:
         async with engine.begin() as conn:
             issue_ids = await _seed_issues(conn)
-            for parent in taxonomy:
-                parent_id = issue_ids[str(parent["slug"])]
-                children = parent.get("children", [])
-                assert isinstance(children, list)
-                for child in children:
-                    child_id = issue_ids[str(child["slug"])]
-                    await _ensure_relation(conn, child_id, parent_id, IssueRelationType.BROADER)
-                    await _ensure_relation(conn, parent_id, child_id, IssueRelationType.NARROWER)
+            canonical = _canonical_edges(taxonomy, issue_ids)
+            await _reconcile_relations(conn, canonical)
     finally:
         await engine.dispose()
-
-
-async def _ensure_relation(
-    conn: AsyncConnection,
-    source_issue_id: UUID,
-    target_issue_id: UUID,
-    relation_type: IssueRelationType,
-) -> None:
-    existing = await conn.execute(
-        select(issue_relation_table.c.id).where(
-            issue_relation_table.c.source_issue_id == source_issue_id,
-            issue_relation_table.c.target_issue_id == target_issue_id,
-            issue_relation_table.c.relation_type == relation_type,
-        )
-    )
-    if existing.scalar_one_or_none() is not None:
-        return
-    await conn.execute(
-        issue_relation_table.insert().values(
-            id=uuid4(),
-            source_issue_id=source_issue_id,
-            target_issue_id=target_issue_id,
-            relation_type=relation_type,
-        )
-    )
 
 
 def main() -> None:

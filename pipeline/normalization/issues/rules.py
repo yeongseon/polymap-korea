@@ -6,7 +6,7 @@ from pathlib import Path
 _TAXONOMY_JSON = Path(__file__).resolve().parents[2] / "taxonomy" / "taxonomy.json"
 
 
-def _load_taxonomy_slugs() -> set[str]:
+def _load_classifiable_slugs() -> set[str]:
     with open(_TAXONOMY_JSON, encoding="utf-8") as f:
         taxonomy = json.load(f)
     slugs: set[str] = set()
@@ -17,6 +17,17 @@ def _load_taxonomy_slugs() -> set[str]:
                 slugs.add(child["slug"])
         else:
             slugs.add(parent["slug"])
+    return slugs
+
+
+def _load_all_taxonomy_slugs() -> set[str]:
+    with open(_TAXONOMY_JSON, encoding="utf-8") as f:
+        taxonomy = json.load(f)
+    slugs: set[str] = set()
+    for parent in taxonomy:
+        slugs.add(parent["slug"])
+        for child in parent.get("children", []):
+            slugs.add(child["slug"])
     return slugs
 
 
@@ -39,10 +50,10 @@ ISSUE_KEYWORDS: dict[str, list[str]] = {
     "administration": ["행정", "자치", "민원", "공무원", "예산", "재정"],
 }
 
-_taxonomy_slugs = _load_taxonomy_slugs()
+_classifiable_slugs = _load_classifiable_slugs()
 _keyword_slugs = set(ISSUE_KEYWORDS.keys())
-_missing_from_keywords = _taxonomy_slugs - _keyword_slugs
-_extra_in_keywords = _keyword_slugs - _taxonomy_slugs
+_missing_from_keywords = _classifiable_slugs - _keyword_slugs
+_extra_in_keywords = _keyword_slugs - _classifiable_slugs
 if _missing_from_keywords or _extra_in_keywords:
     parts = []
     if _missing_from_keywords:
@@ -50,5 +61,7 @@ if _missing_from_keywords or _extra_in_keywords:
     if _extra_in_keywords:
         parts.append(f"extra in ISSUE_KEYWORDS: {sorted(_extra_in_keywords)}")
     raise RuntimeError(
-        f"ISSUE_KEYWORDS out of sync with taxonomy.json — {'; '.join(parts)}"
+        f"ISSUE_KEYWORDS out of sync with taxonomy.json classifiable slugs — {'; '.join(parts)}"
     )
+
+ALL_TAXONOMY_SLUGS: frozenset[str] = frozenset(_load_all_taxonomy_slugs())
