@@ -9,6 +9,6 @@ deployments:
   - name: nec-snapshot
     version: 0.1.0
     description: Capture raw NEC source snapshots.
-    entrypoint: publish/snapshot.py:publish_snapshot_flow
+    entrypoint: flows/publish.py:publish_snapshot
     work_pool:
-      name: default-agent-pool
+      name: polymap-pool

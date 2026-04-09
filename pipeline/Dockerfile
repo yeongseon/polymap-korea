@@ -18,6 +18,7 @@ COPY pipeline/flows pipeline/flows
 COPY pipeline/normalization pipeline/normalization
 COPY pipeline/publish pipeline/publish
 COPY pipeline/sources pipeline/sources
+COPY pipeline/taxonomy pipeline/taxonomy
 
 RUN python -m venv /opt/venv \
     && printf '[tool.uv.workspace]\nmembers = ["pipeline", "packages/ontology"]\n\n[tool.uv.sources]\npolymap-ontology = { workspace = true }\n' > pyproject.toml \

@@ -32,7 +32,7 @@ Issue #1 establishes the v1 monorepo foundation for a Korean local election vote
 
 7. **Local runtime model**
    - Next.js, FastAPI, and pipeline code run on the host machine.
-   - Docker is reserved for infrastructure dependencies: PostgreSQL, Redis, MinIO, OpenSearch, and Prefect server.
+    - Docker is reserved for infrastructure dependencies: PostgreSQL, MinIO, OpenSearch, and Prefect server.
 
 ## Repository Layout
 
@@ -45,7 +45,7 @@ Issue #1 establishes the v1 monorepo foundation for a Korean local election vote
 
 ## Compose Profiles
 
-- `core`: PostgreSQL, Redis, MinIO
+- `core`: PostgreSQL, MinIO
 - `search`: OpenSearch
 - `orchestrator`: Prefect server
 - `full`: everything above

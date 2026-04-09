@@ -39,7 +39,7 @@ services:
     depends_on:
       - api
     environment:
-      NEXT_PUBLIC_API_URL: http://api:8000/api/v1
+      NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1
 
   opensearch:
     image: opensearchproject/opensearch:2.17.0
