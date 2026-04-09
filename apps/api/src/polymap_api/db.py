@@ -1,18 +1,16 @@
+# ruff: noqa: TC003,E501,F401
 from __future__ import annotations
 
-import datetime as dt
-import uuid
-from collections import abc
+from collections.abc import AsyncIterator
+from datetime import datetime
+from uuid import UUID
 
-from sqlalchemy import DateTime, MetaData, func
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy import DateTime, MetaData, func, text
+from sqlalchemy.dialects.postgresql import UUID as PGUUID
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 from .config import settings
-
-AsyncIteratorType = abc.AsyncIterator
-DateTimeType = dt.datetime
 
 convention = {
     "ix": "ix_%(column_0_label)s",
@@ -21,38 +19,42 @@ convention = {
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
     "pk": "pk_%(table_name)s",
 }
-metadata = MetaData(naming_convention=convention)
 
 
 class Base(DeclarativeBase):
-    metadata = metadata
+    metadata = MetaData(naming_convention=convention)
+
+
+class UUIDPrimaryKeyMixin:
+    id: Mapped[UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("gen_random_uuid()"),
+    )
 
 
 class TimestampMixin:
-    created_at: Mapped[DateTimeType] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
     )
-    updated_at: Mapped[DateTimeType] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
     )
 
 
 class SoftDeleteMixin:
-    deleted_at: Mapped[DateTimeType | None] = mapped_column(
-        DateTime(timezone=True), default=None, nullable=True
-    )
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
-class UUIDPrimaryKeyMixin:
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
+engine = create_async_engine(settings.database_url, echo=settings.debug, future=True)
+async_session_factory = async_sessionmaker(engine, expire_on_commit=False, autoflush=False)
 
 
-engine = create_async_engine(settings.database_url, echo=settings.debug)
-async_session_factory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-
-
-async def get_session() -> AsyncIteratorType[AsyncSession]:
+async def get_session() -> AsyncIterator[object]:
     async with async_session_factory() as session:
         yield session

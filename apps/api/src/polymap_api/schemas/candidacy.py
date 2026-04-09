@@ -1,32 +1,49 @@
+# ruff: noqa: I001,TC002,TC003,E501,F401
 from __future__ import annotations
 
-import datetime as dt
-import uuid
+from datetime import date, datetime
+from uuid import UUID
+
+from pydantic import BaseModel, ConfigDict, Field
 
 from polymap_ontology.enums import CandidacyStatus
-from pydantic import BaseModel, ConfigDict
-
-DateType = dt.date
-DateTimeType = dt.datetime
-UUIDType = uuid.UUID
 
 
 class CandidacyBase(BaseModel):
-    person_id: UUIDType
-    race_id: UUIDType
-    party_id: UUIDType | None = None
+    model_config = ConfigDict(extra="ignore")
+
+    person_id: UUID
+    race_id: UUID
+    party_id: UUID | None = None
     status: CandidacyStatus = CandidacyStatus.REGISTERED
-    candidate_number: int | None = None
-    registered_at: DateType | None = None
+    registered_at: date | None = None
+    candidate_number: int | None = Field(default=None, ge=1)
 
 
 class CandidacyCreate(CandidacyBase):
     pass
 
 
+class CandidacyUpdate(CandidacyBase):
+    person_id: UUID | None = None
+    race_id: UUID | None = None
+    status: CandidacyStatus | None = None
+    candidate_number: int | None = Field(default=None, ge=1)
+
+
 class CandidacyRead(CandidacyBase):
     model_config = ConfigDict(from_attributes=True)
 
-    id: UUIDType
-    created_at: DateTimeType
-    updated_at: DateTimeType
+    id: UUID
+    created_at: datetime
+    updated_at: datetime
+
+
+class CandidacySummary(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    person_id: UUID
+    race_id: UUID
+    status: CandidacyStatus
+    candidate_number: int | None

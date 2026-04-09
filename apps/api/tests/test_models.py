@@ -4,7 +4,7 @@ from sqlalchemy import UniqueConstraint
 from sqlalchemy.sql.schema import Table
 
 from polymap_api.db import Base
-from polymap_api.models import AuditLog, Candidacy, District, Issue, IssueRelation, Person
+from polymap_api.models import AuditLog, Candidacy, Claim, District, Issue, IssueRelation, Party, Person, Promise, SourceDoc
 
 
 def test_all_expected_tables_registered() -> None:
@@ -67,6 +67,8 @@ def test_relationship_attributes_exist() -> None:
     assert hasattr(Person, "candidacies")
     assert hasattr(Person, "committee_assignments")
     assert hasattr(Person, "bill_sponsorships")
+    assert hasattr(Candidacy, "claims")
+    assert hasattr(Claim, "candidacy")
     assert hasattr(District, "parent")
     assert hasattr(District, "children")
     assert hasattr(Issue, "parent")
@@ -75,3 +77,27 @@ def test_relationship_attributes_exist() -> None:
 
 def test_audit_log_has_no_updated_at_column() -> None:
     assert "updated_at" not in AuditLog.__table__.columns.keys()
+
+
+def test_claim_uses_candidacy_foreign_key() -> None:
+    claim_table = Claim.__table__
+
+    assert "candidacy_id" in claim_table.columns.keys()
+    assert "subject_person_id" not in claim_table.columns.keys()
+    assert {fk.column.table.name for fk in claim_table.c.candidacy_id.foreign_keys} == {"candidacy"}
+
+
+def test_issue_has_unique_slug_column() -> None:
+    issue_table = Issue.__table__
+
+    assert "slug" in issue_table.columns.keys()
+    assert issue_table.c.slug.unique is True
+
+
+def test_soft_delete_scope_matches_oracle_approval() -> None:
+    for model in (Candidacy, Promise, Claim):
+        assert "deleted_at" not in model.__table__.columns.keys()
+
+    assert "deleted_at" in Person.__table__.columns.keys()
+    assert "deleted_at" in Party.__table__.columns.keys()
+    assert "deleted_at" in SourceDoc.__table__.columns.keys()

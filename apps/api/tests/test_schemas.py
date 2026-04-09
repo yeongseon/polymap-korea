@@ -7,12 +7,14 @@ from datetime import date, datetime, timezone
 import pytest
 from pydantic import ValidationError
 
+from polymap_api.schemas.audit_log import AuditLogRead
 from polymap_api.schemas.bill import BillSponsorshipCreate, BillSponsorshipRead
 from polymap_api.schemas.candidacy import CandidacyCreate, CandidacyRead
 from polymap_api.schemas.claim import ClaimCreate, ClaimRead
 from polymap_api.schemas.committee import CommitteeAssignmentCreate, CommitteeAssignmentRead
 from polymap_api.schemas.district import DistrictCreate, DistrictRead
 from polymap_api.schemas.election import ElectionCreate, ElectionRead
+from polymap_api.schemas.election_window import ElectionWindowCreate, ElectionWindowRead
 from polymap_api.schemas.issue import IssueCreate, IssueRead, IssueRelationCreate, IssueRelationRead
 from polymap_api.schemas.party import PartyCreate, PartyRead
 from polymap_api.schemas.person import PersonCreate, PersonRead
@@ -23,6 +25,7 @@ from polymap_ontology.enums import (
     BillStatus,
     CandidacyStatus,
     ClaimType,
+    ElectionPhase,
     ElectionType,
     Gender,
     IssueRelationType,
@@ -37,13 +40,19 @@ def test_create_schemas_accept_valid_data() -> None:
     issue_id = uuid.uuid4()
 
     assert PersonCreate(name_ko="홍길동", gender=Gender.MALE).name_ko == "홍길동"
-    assert PartyCreate(name_ko="미래당", color="#00AAFF").color == "#00AAFF"
+    assert PartyCreate(name_ko="미래당", color_hex="#00AAFF").color == "#00AAFF"
     assert ElectionCreate(
         name="2026 Local General Election",
         election_type=ElectionType.LOCAL_GENERAL,
         election_date=date(2026, 6, 3),
     ).election_type is ElectionType.LOCAL_GENERAL
-    assert DistrictCreate(name="Seoul", code="11", level="시도").code == "11"
+    assert ElectionWindowCreate(
+        election_id=uuid.uuid4(),
+        phase=ElectionPhase.CAMPAIGN,
+        starts_at=datetime(2026, 5, 19, tzinfo=timezone.utc),
+        ends_at=datetime(2026, 6, 2, tzinfo=timezone.utc),
+    ).phase is ElectionPhase.CAMPAIGN
+    assert DistrictCreate(name_ko="Seoul", code="11", level="시도").code == "11"
     assert RaceCreate(
         election_id=uuid.uuid4(),
         district_id=uuid.uuid4(),
@@ -51,7 +60,7 @@ def test_create_schemas_accept_valid_data() -> None:
     ).seat_count == 1
     assert CandidacyCreate(person_id=person_id, race_id=race_id).status is CandidacyStatus.REGISTERED
     assert PromiseCreate(candidacy_id=uuid.uuid4(), title="Transit").title == "Transit"
-    assert SourceDocCreate(kind=SourceDocKind.PDF, title="Manifesto").kind is SourceDocKind.PDF
+    assert SourceDocCreate(kind=SourceDocKind.PDF, title="Manifesto", raw_s3_key="docs/manifesto.pdf").raw_s3_key == "docs/manifesto.pdf"
     assert ClaimCreate(
         candidacy_id=uuid.uuid4(),
         source_doc_id=uuid.uuid4(),
@@ -75,6 +84,15 @@ def test_create_schemas_accept_valid_data() -> None:
         (PartyCreate, {"name_ko": "미래당", "color": "blue"}),
         (ElectionCreate, {"name": "Election", "election_type": "bad", "election_date": "2026-06-03"}),
         (RaceCreate, {"election_id": str(uuid.uuid4()), "district_id": str(uuid.uuid4()), "position_type": "mayor", "seat_count": 0}),
+        (
+            ElectionWindowCreate,
+            {
+                "election_id": str(uuid.uuid4()),
+                "phase": "bad",
+                "starts_at": "2026-05-19T00:00:00Z",
+                "ends_at": "2026-06-02T00:00:00Z",
+            },
+        ),
         (ClaimCreate, {"candidacy_id": str(uuid.uuid4()), "source_doc_id": str(uuid.uuid4()), "claim_type": "bad", "content": "Fact"}),
     ],
 )
@@ -103,6 +121,7 @@ def test_read_schemas_support_from_attributes() -> None:
         PersonRead,
         PartyRead,
         ElectionRead,
+        ElectionWindowRead,
         DistrictRead,
         RaceRead,
         CandidacyRead,
@@ -113,6 +132,7 @@ def test_read_schemas_support_from_attributes() -> None:
         IssueRelationRead,
         CommitteeAssignmentRead,
         BillSponsorshipRead,
+        AuditLogRead,
     ]:
         assert schema_cls.model_config.get("from_attributes") is True
 
@@ -130,3 +150,45 @@ def test_read_schemas_support_from_attributes() -> None:
     )
 
     assert PersonRead.model_validate(person).id == person.id
+
+
+def test_claim_create_requires_candidacy_id() -> None:
+    payload = {
+        "source_doc_id": str(uuid.uuid4()),
+        "claim_type": ClaimType.OFFICIAL_FACT,
+        "content": "Fact",
+    }
+
+    with pytest.raises(ValidationError):
+        ClaimCreate(**payload)
+
+
+def test_issue_create_requires_slug() -> None:
+    with pytest.raises(ValidationError):
+        IssueCreate.model_validate({"name": "Housing"})
+
+
+def test_election_window_read_supports_from_attributes() -> None:
+    now = datetime.now(timezone.utc)
+
+    @dataclass
+    class ElectionWindowObj:
+        id: uuid.UUID
+        election_id: uuid.UUID
+        phase: ElectionPhase
+        starts_at: datetime
+        ends_at: datetime
+        created_at: datetime
+        updated_at: datetime
+
+    obj = ElectionWindowObj(
+        id=uuid.uuid4(),
+        election_id=uuid.uuid4(),
+        phase=ElectionPhase.CAMPAIGN,
+        starts_at=now,
+        ends_at=now,
+        created_at=now,
+        updated_at=now,
+    )
+
+    assert ElectionWindowRead.model_validate(obj).phase is ElectionPhase.CAMPAIGN

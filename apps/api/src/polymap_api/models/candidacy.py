@@ -1,17 +1,15 @@
+# ruff: noqa: I001,TC003,E501,F401
 from __future__ import annotations
 
-import datetime as dt
-import uuid
+from datetime import date
 from typing import TYPE_CHECKING
+from uuid import UUID
 
-from polymap_ontology.enums import CandidacyStatus
-from sqlalchemy import Enum, ForeignKey, Integer, UniqueConstraint
+from sqlalchemy import CheckConstraint, Enum, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from ..db import Base, TimestampMixin, UUIDPrimaryKeyMixin
-
-DateType = dt.date
-UUIDType = uuid.UUID
+from polymap_api.db import Base, TimestampMixin, UUIDPrimaryKeyMixin
+from polymap_ontology.enums import CandidacyStatus
 
 if TYPE_CHECKING:
     from .claim import Claim
@@ -23,21 +21,33 @@ if TYPE_CHECKING:
 
 class Candidacy(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "candidacy"
-    __table_args__ = (UniqueConstraint("person_id", "race_id"),)
-
-    person_id: Mapped[UUIDType] = mapped_column(ForeignKey("person.id"), nullable=False)
-    race_id: Mapped[UUIDType] = mapped_column(ForeignKey("race.id"), nullable=False)
-    party_id: Mapped[UUIDType | None] = mapped_column(ForeignKey("party.id"), nullable=True)
-    status: Mapped[CandidacyStatus] = mapped_column(
-        Enum(CandidacyStatus, name="candidacy_status"),
-        nullable=False,
-        default=CandidacyStatus.REGISTERED,
+    __table_args__ = (
+        CheckConstraint("candidate_number IS NULL OR candidate_number >= 1", name="candidate_number_positive"),
+        UniqueConstraint("person_id", "race_id", name="person_race"),
     )
-    candidate_number: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    registered_at: Mapped[DateType | None] = mapped_column(nullable=True)
+
+    person_id: Mapped[UUID] = mapped_column(
+        ForeignKey("person.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    race_id: Mapped[UUID] = mapped_column(
+        ForeignKey("race.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    party_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("party.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    status: Mapped[CandidacyStatus] = mapped_column(
+        Enum(CandidacyStatus, name="candidacy_status_enum"),
+        nullable=False,
+        server_default=CandidacyStatus.REGISTERED.value,
+    )
+    registered_at: Mapped[date | None] = mapped_column(nullable=True)
+    candidate_number: Mapped[int | None] = mapped_column(nullable=True)
 
     person: Mapped[Person] = relationship(back_populates="candidacies")
     race: Mapped[Race] = relationship(back_populates="candidacies")
     party: Mapped[Party | None] = relationship(back_populates="candidacies")
-    promises: Mapped[list[Promise]] = relationship(back_populates="candidacy")
-    claims: Mapped[list[Claim]] = relationship(back_populates="candidacy")
+    promises: Mapped[list[Promise]] = relationship(back_populates="candidacy", passive_deletes=True)
+    claims: Mapped[list[Claim]] = relationship(back_populates="candidacy", passive_deletes=True)

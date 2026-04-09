@@ -1,3 +1,4 @@
+# ruff: noqa: TC003,E501,F401
 from __future__ import annotations
 
 from .audit_log import AuditLog
