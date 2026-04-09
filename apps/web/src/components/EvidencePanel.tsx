@@ -10,21 +10,19 @@ interface EvidencePanelProps {
 }
 
 const CLAIM_TYPE_KO: Record<string, string> = {
-  fact: "사실",
-  promise_check: "공약 검증",
-  allegation: "의혹",
-  denial: "부인",
-  support: "지지",
-  criticism: "비판",
+  official_fact: "공식 사실",
+  sourced_claim: "출처 확인",
+  opinion: "의견",
+  disputed: "논쟁 중",
+  ai_summary: "AI 요약",
 };
 
 const CLAIM_TYPE_COLORS: Record<string, string> = {
-  fact: "bg-blue-100 text-blue-800",
-  promise_check: "bg-green-100 text-green-800",
-  allegation: "bg-red-100 text-red-800",
-  denial: "bg-slate-100 text-slate-800",
-  support: "bg-emerald-100 text-emerald-800",
-  criticism: "bg-orange-100 text-orange-800",
+  official_fact: "bg-blue-100 text-blue-800",
+  sourced_claim: "bg-green-100 text-green-800",
+  opinion: "bg-slate-100 text-slate-800",
+  disputed: "bg-red-100 text-red-800",
+  ai_summary: "bg-purple-100 text-purple-800",
 };
 
 export function EvidencePanel({

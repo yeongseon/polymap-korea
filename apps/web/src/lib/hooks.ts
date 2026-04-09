@@ -14,6 +14,7 @@ import {
   getPersons,
   resolveBallot,
   search,
+  getCandidaciesByDistrict,
 } from "@/lib/api";
 
 export function useBallotResolve() {
@@ -49,6 +50,14 @@ export function useCandidacies(params: Record<string, string | number>) {
   return useQuery({
     queryKey: ["candidacies", params],
     queryFn: () => getCandidacies(params),
+  });
+}
+
+export function useCandidaciesByDistrict(districtId: string) {
+  return useQuery({
+    queryKey: ["candidacies-by-district", districtId],
+    queryFn: () => getCandidaciesByDistrict(districtId),
+    enabled: !!districtId,
   });
 }
 

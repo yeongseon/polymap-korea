@@ -14,37 +14,35 @@ type PanelContent =
   | null;
 
 const CLAIM_TYPE_KO: Record<string, string> = {
-  fact: "사실",
-  promise_check: "공약 검증",
-  allegation: "의혹",
-  denial: "부인",
-  support: "지지",
-  criticism: "비판",
+  official_fact: "공식 사실",
+  sourced_claim: "출처 확인",
+  opinion: "의견",
+  disputed: "논쟁 중",
+  ai_summary: "AI 요약",
 };
 
 const STATUS_KO: Record<string, string> = {
   registered: "등록",
-  confirmed: "확정",
-  elected: "당선",
   withdrawn: "사퇴",
   disqualified: "무효",
+  elected: "당선",
+  defeated: "낙선",
 };
 
 const STATUS_COLORS: Record<string, string> = {
   registered: "bg-blue-100 text-blue-800",
-  confirmed: "bg-green-100 text-green-800",
   elected: "bg-emerald-100 text-emerald-800",
   withdrawn: "bg-slate-100 text-slate-600",
   disqualified: "bg-red-100 text-red-800",
+  defeated: "bg-slate-100 text-slate-600",
 };
 
 const CLAIM_TYPE_BADGE: Record<string, string> = {
-  fact: "bg-blue-100 text-blue-800",
-  promise_check: "bg-green-100 text-green-800",
-  allegation: "bg-red-100 text-red-800",
-  denial: "bg-slate-100 text-slate-800",
-  support: "bg-emerald-100 text-emerald-800",
-  criticism: "bg-orange-100 text-orange-800",
+  official_fact: "bg-blue-100 text-blue-800",
+  sourced_claim: "bg-green-100 text-green-800",
+  opinion: "bg-slate-100 text-slate-800",
+  disputed: "bg-red-100 text-red-800",
+  ai_summary: "bg-purple-100 text-purple-800",
 };
 
 export default function CandidateDetailPage({
@@ -159,7 +157,7 @@ export default function CandidateDetailPage({
                 <span
                   className="rounded-full px-3 py-1 text-xs font-bold text-white"
                   style={{
-                    backgroundColor: candidacy.party.color ?? "#8b5cf6",
+                    backgroundColor: candidacy.party.color_hex ?? "#8b5cf6",
                   }}
                 >
                   {candidacy.party.name_ko}

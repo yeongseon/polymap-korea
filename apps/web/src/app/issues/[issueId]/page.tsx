@@ -85,6 +85,31 @@ export default function IssueDetailPage({
         </div>
       )}
 
+      {issue.related_promises && issue.related_promises.length > 0 && (
+        <section className="mb-8">
+          <h2 className="mb-4 text-lg font-bold text-slate-900">
+            관련 공약{" "}
+            <span className="text-base font-normal text-slate-400">
+              ({issue.related_promises.length}개)
+            </span>
+          </h2>
+          <div className="flex flex-col gap-3">
+            {issue.related_promises.map((rp) => (
+              <Link
+                key={rp.id}
+                href={`/candidate/${rp.candidacy.id}`}
+                className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-green-300 hover:shadow-md"
+              >
+                <p className="font-semibold text-slate-800">{rp.title}</p>
+                <p className="mt-1 text-xs text-slate-500">
+                  후보 상세 보기 →
+                </p>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
       <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-base font-bold text-slate-800">이슈 정보</h2>
         <dl className="space-y-3">

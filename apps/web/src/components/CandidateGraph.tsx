@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import type { CandidacyDetail, ClaimRead, PromiseRead } from "@/lib/types";
 
 type NodeData =
@@ -29,12 +29,11 @@ const NODE_LABELS_KO: Record<string, string> = {
 };
 
 const CLAIM_TYPE_KO: Record<string, string> = {
-  fact: "사실",
-  promise_check: "공약 검증",
-  allegation: "의혹",
-  denial: "부인",
-  support: "지지",
-  criticism: "비판",
+  official_fact: "공식 사실",
+  sourced_claim: "출처 확인",
+  opinion: "의견",
+  disputed: "논쟁 중",
+  ai_summary: "AI 요약",
 };
 
 function MobileListView({
@@ -138,8 +137,15 @@ function MobileListView({
 export function CandidateGraph({ candidacy, onNodeClick }: CandidateGraphProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const cyRef = useRef<import("cytoscape").Core | null>(null);
+  const onNodeClickRef = useRef(onNodeClick);
   const [isMobile, setIsMobile] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  onNodeClickRef.current = onNodeClick;
+
+  const handleNodeClick = useCallback((node: NodeData) => {
+    onNodeClickRef.current?.(node);
+  }, []);
 
   useEffect(() => {
     setMounted(true);
@@ -309,9 +315,9 @@ export function CandidateGraph({ candidacy, onNodeClick }: CandidateGraphProps) 
         const itemId: string | undefined = node.data("itemId") as string | undefined;
 
         if (nodeType === "person") {
-          onNodeClick?.({ type: "person", id: nodeId, label });
+          handleNodeClick({ type: "person", id: nodeId, label });
         } else if (nodeType === "party" && candidacy.party) {
-          onNodeClick?.({
+          handleNodeClick({
             type: "party",
             id: candidacy.party.id,
             label: candidacy.party.name_ko,
@@ -319,12 +325,12 @@ export function CandidateGraph({ candidacy, onNodeClick }: CandidateGraphProps) 
         } else if (nodeType === "promise" && itemId) {
           const promise = candidacy.promises.find((p) => p.id === itemId);
           if (promise) {
-            onNodeClick?.({ type: "promise", id: itemId, label, item: promise });
+            handleNodeClick({ type: "promise", id: itemId, label, item: promise });
           }
         } else if (nodeType === "claim" && itemId) {
           const claim = candidacy.claims.find((c) => c.id === itemId);
           if (claim) {
-            onNodeClick?.({ type: "claim", id: itemId, label, item: claim });
+            handleNodeClick({ type: "claim", id: itemId, label, item: claim });
           }
         }
       });
@@ -340,7 +346,7 @@ export function CandidateGraph({ candidacy, onNodeClick }: CandidateGraphProps) 
         cyRef.current = null;
       }
     };
-  }, [mounted, isMobile, candidacy, onNodeClick]);
+  }, [mounted, isMobile, candidacy, handleNodeClick]);
 
   useEffect(() => {
     if (!containerRef.current) return;

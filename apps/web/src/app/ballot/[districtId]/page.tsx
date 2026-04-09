@@ -1,28 +1,32 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useBallotResolve } from "@/lib/hooks";
-import type { BallotRaceResult, CandidacySummary } from "@/lib/types";
+import { useBallotResolve, useCandidacy } from "@/lib/hooks";
+import type { BallotRaceResult, BallotResolveResponse, CandidacySummary } from "@/lib/types";
 
 const POSITION_TYPE_KO: Record<string, string> = {
   mayor: "시장",
   governor: "도지사",
-  district_mayor: "구청장",
-  county_head: "군수",
-  city_head: "시장",
-  assembly_metro: "광역의원",
-  assembly_local: "기초의원",
+  council_member: "기초의원",
   superintendent: "교육감",
-  education_director: "교육감",
+  proportional_council: "비례대표의원",
+};
+
+const STATUS_KO: Record<string, string> = {
+  registered: "등록",
+  withdrawn: "사퇴",
+  disqualified: "무효",
+  elected: "당선",
+  defeated: "낙선",
 };
 
 function positionLabel(type: string): string {
   return POSITION_TYPE_KO[type] ?? type;
 }
 
-function CandidateCard({
+function EnrichedCandidateCard({
   candidacy,
   selected,
   onToggle,
@@ -31,6 +35,12 @@ function CandidateCard({
   selected: boolean;
   onToggle: (id: string) => void;
 }) {
+  const { data: detail } = useCandidacy(candidacy.id);
+
+  const name = detail?.person.name_ko ?? `후보 ${candidacy.candidate_number ?? ""}`;
+  const partyName = detail?.party?.name_ko;
+  const partyColor = detail?.party?.color_hex ?? "#8b5cf6";
+
   return (
     <div
       className={`rounded-xl border-2 p-4 transition ${
@@ -46,8 +56,20 @@ function CandidateCard({
               기호 {candidacy.candidate_number}번
             </span>
           )}
-          <p className="font-semibold text-slate-900">후보 ID: {candidacy.person_id.slice(0, 8)}…</p>
-          <p className="mt-0.5 text-xs text-slate-500">상태: {candidacy.status}</p>
+          <p className="font-semibold text-slate-900">{name}</p>
+          <div className="mt-1 flex flex-wrap gap-1.5">
+            {partyName && (
+              <span
+                className="rounded-full px-2 py-0.5 text-xs font-medium text-white"
+                style={{ backgroundColor: partyColor }}
+              >
+                {partyName}
+              </span>
+            )}
+            <span className="text-xs text-slate-500">
+              {STATUS_KO[candidacy.status] ?? candidacy.status}
+            </span>
+          </div>
         </div>
         <div className="flex flex-col gap-2">
           <button
@@ -99,7 +121,7 @@ function RaceSection({
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
           {result.candidacies.map((c) => (
-            <CandidateCard
+            <EnrichedCandidateCard
               key={c.id}
               candidacy={c}
               selected={selectedIds.has(c.id)}
@@ -120,14 +142,22 @@ export default function BallotPage({
   const { districtId } = use(params);
   const router = useRouter();
   const [address, setAddress] = useState("");
-  const [resolved, setResolved] = useState<{
-    districtName: string;
-    races: BallotRaceResult[];
-  } | null>(null);
+  const [ballotData, setBallotData] = useState<BallotResolveResponse | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const { mutate, isPending, isError } = useBallotResolve();
 
-  function toggleCandidate(id: string) {
+  useEffect(() => {
+    try {
+      const cached = sessionStorage.getItem(`ballot:${districtId}`);
+      if (cached) {
+        setBallotData(JSON.parse(cached) as BallotResolveResponse);
+      }
+    } catch {
+      // sessionStorage may be unavailable
+    }
+  }, [districtId]);
+
+  const toggleCandidate = useCallback((id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
@@ -137,21 +167,29 @@ export default function BallotPage({
       }
       return next;
     });
-  }
+  }, []);
 
   function handleSearch() {
     if (!address.trim()) return;
     mutate(address.trim(), {
       onSuccess(data) {
-        setResolved({
-          districtName: data.district.name_ko,
-          races: data.races,
-        });
+        setBallotData(data);
+        try {
+          sessionStorage.setItem(
+            `ballot:${data.district.id}`,
+            JSON.stringify(data)
+          );
+        } catch {
+          // sessionStorage may be unavailable
+        }
+        if (data.district.id !== districtId) {
+          router.push(`/ballot/${data.district.id}`);
+        }
       },
     });
   }
 
-  const districtLabel = resolved?.districtName ?? `선거구 ${districtId.slice(0, 8)}…`;
+  const districtLabel = ballotData?.district.name_ko ?? `선거구 ${districtId.slice(0, 8)}…`;
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
@@ -160,13 +198,19 @@ export default function BallotPage({
           투표지 확인
         </p>
         <h1 className="mt-1 text-3xl font-black text-slate-900">{districtLabel}</h1>
-        <p className="mt-2 text-slate-500">
-          주소를 다시 입력하여 선거구 정보를 불러오세요.
-        </p>
+        {!ballotData && (
+          <p className="mt-2 text-slate-500">
+            주소를 입력하여 선거구 정보를 불러오세요.
+          </p>
+        )}
       </div>
 
       <div className="mb-8 flex gap-3">
+        <label htmlFor="ballot-address-input" className="sr-only">
+          주소 입력
+        </label>
         <input
+          id="ballot-address-input"
           type="text"
           value={address}
           onChange={(e) => setAddress(e.target.value)}
@@ -207,12 +251,12 @@ export default function BallotPage({
         </div>
       )}
 
-      {resolved ? (
+      {ballotData ? (
         <div className="flex flex-col gap-6">
-          {resolved.races.length === 0 ? (
+          {ballotData.races.length === 0 ? (
             <p className="text-slate-500">해당 선거구에 등록된 선거가 없습니다.</p>
           ) : (
-            resolved.races.map((r) => (
+            ballotData.races.map((r) => (
               <RaceSection
                 key={r.race.id}
                 result={r}
@@ -225,7 +269,7 @@ export default function BallotPage({
       ) : (
         <div className="rounded-2xl border-2 border-dashed border-slate-200 p-12 text-center">
           <p className="text-4xl">🗳️</p>
-          <p className="mt-4 text-lg font-semibold text-slate-700">주소를 입력해주세요</p>
+          <p className="mt-4 text-lg font-semibold text-slate-700">투표지 정보 불러오는 중</p>
           <p className="mt-2 text-sm text-slate-400">
             위의 검색창에 주소를 입력하면 투표지 정보를 확인할 수 있습니다.
           </p>

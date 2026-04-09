@@ -18,7 +18,7 @@ const TABS: { key: TabKey; label: string }[] = [
 function PersonItem({ person }: { person: PersonSummary }) {
   return (
     <Link
-      href={`/candidate/${person.id}`}
+      href={`/search?q=${encodeURIComponent(person.name_ko)}&type=persons`}
       className="flex items-center gap-3 rounded-xl border border-slate-100 bg-white p-4 transition hover:border-blue-200 hover:bg-blue-50/40"
     >
       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-200 text-slate-600">
@@ -34,13 +34,16 @@ function PersonItem({ person }: { person: PersonSummary }) {
 
 function IssueItem({ issue }: { issue: IssueSummary }) {
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-slate-100 bg-white p-4">
+    <Link
+      href={`/issues/${issue.id}`}
+      className="flex items-center gap-3 rounded-xl border border-slate-100 bg-white p-4 transition hover:border-blue-200 hover:bg-blue-50/40"
+    >
       <span className="text-2xl">📌</span>
       <div>
         <p className="font-semibold text-slate-900">{issue.name}</p>
-        <p className="text-xs text-slate-500">슬러그: {issue.slug}</p>
+        <p className="text-xs text-slate-500">/{issue.slug}</p>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -49,7 +52,7 @@ function PartyItem({ party }: { party: PartySummary }) {
     <div className="flex items-center gap-3 rounded-xl border border-slate-100 bg-white p-4">
       <div
         className="h-4 w-4 shrink-0 rounded-full"
-        style={{ background: party.color ?? "#94a3b8" }}
+        style={{ background: party.color_hex ?? "#94a3b8" }}
       />
       <div>
         <p className="font-semibold text-slate-900">{party.name_ko}</p>
@@ -96,7 +99,11 @@ function SearchContent() {
       <h1 className="mb-6 text-3xl font-black text-slate-900">검색</h1>
 
       <form onSubmit={handleSubmit} className="flex gap-2">
+        <label htmlFor="search-input" className="sr-only">
+          검색어 입력
+        </label>
         <input
+          id="search-input"
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}

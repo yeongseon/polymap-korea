@@ -34,6 +34,14 @@ export default function HomePage() {
     if (!address.trim()) return;
     mutate(address.trim(), {
       onSuccess(data) {
+        try {
+          sessionStorage.setItem(
+            `ballot:${data.district.id}`,
+            JSON.stringify(data)
+          );
+        } catch {
+          // sessionStorage may be unavailable
+        }
         router.push(`/ballot/${data.district.id}`);
       },
     });
@@ -73,7 +81,11 @@ export default function HomePage() {
           </p>
 
           <form onSubmit={handleSubmit} className="mt-10 flex flex-col gap-3 sm:flex-row sm:gap-0">
+            <label htmlFor="address-input" className="sr-only">
+              주소 입력
+            </label>
             <input
+              id="address-input"
               type="text"
               value={address}
               onChange={(e) => setAddress(e.target.value)}

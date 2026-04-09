@@ -7,20 +7,19 @@ import { useCandidacy } from "@/lib/hooks";
 import type { CandidacyDetail } from "@/lib/types";
 
 const CLAIM_TYPE_KO: Record<string, string> = {
-  fact: "사실",
-  promise_check: "공약 검증",
-  allegation: "의혹",
-  denial: "부인",
-  support: "지지",
-  criticism: "비판",
+  official_fact: "공식 사실",
+  sourced_claim: "출처 확인",
+  opinion: "의견",
+  disputed: "논쟁 중",
+  ai_summary: "AI 요약",
 };
 
 const STATUS_KO: Record<string, string> = {
   registered: "등록",
-  confirmed: "확정",
-  elected: "당선",
   withdrawn: "사퇴",
   disqualified: "무효",
+  elected: "당선",
+  defeated: "낙선",
 };
 
 function CandidacyColumn({
@@ -96,7 +95,7 @@ function CandidacyCard({
           {candidacy.party && (
             <span
               className="rounded-full px-2.5 py-0.5 text-xs font-medium text-white"
-              style={{ backgroundColor: candidacy.party.color ?? "#8b5cf6" }}
+              style={{ backgroundColor: candidacy.party.color_hex ?? "#8b5cf6" }}
             >
               {candidacy.party.name_ko}
             </span>

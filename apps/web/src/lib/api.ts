@@ -5,8 +5,8 @@ import type {
   ClaimRead,
   ElectionDetail,
   ElectionSummary,
-  IssueRead,
-  IssueSummary,
+  IssueDetail,
+  IssueTreeNode,
   PersonRead,
   PersonSummary,
   PromiseRead,
@@ -16,13 +16,26 @@ import type {
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
 
+const ISR_REVALIDATE = 300;
+
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {
     headers: { "Content-Type": "application/json", ...init?.headers },
     ...init,
   });
   if (!res.ok) {
-    throw new Error(`API ${res.status}: ${res.statusText}`);
+    throw new Error(`요청을 처리할 수 없습니다 (${res.status})`);
+  }
+  return res.json() as Promise<T>;
+}
+
+async function serverFetch<T>(path: string): Promise<T> {
+  const res = await fetch(`${BASE_URL}${path}`, {
+    headers: { "Content-Type": "application/json" },
+    next: { revalidate: ISR_REVALIDATE },
+  });
+  if (!res.ok) {
+    throw new Error(`요청을 처리할 수 없습니다 (${res.status})`);
   }
   return res.json() as Promise<T>;
 }
@@ -63,12 +76,12 @@ export function getPerson(id: string): Promise<PersonRead> {
   return apiFetch<PersonRead>(`/persons/${id}`);
 }
 
-export function getIssues(): Promise<IssueSummary[]> {
-  return apiFetch<IssueSummary[]>("/issues");
+export function getIssues(): Promise<IssueTreeNode[]> {
+  return apiFetch<IssueTreeNode[]>("/issues");
 }
 
-export function getIssue(id: string): Promise<IssueRead> {
-  return apiFetch<IssueRead>(`/issues/${id}`);
+export function getIssue(id: string): Promise<IssueDetail> {
+  return apiFetch<IssueDetail>(`/issues/${id}`);
 }
 
 export function search(q: string, type?: string): Promise<SearchResponse> {
@@ -83,4 +96,27 @@ export function getCandidacyPromises(id: string): Promise<PromiseRead[]> {
 
 export function getCandidacyClaims(id: string): Promise<ClaimRead[]> {
   return apiFetch<ClaimRead[]>(`/candidacies/${id}/claims`);
+}
+
+export function getBallotByDistrict(districtId: string): Promise<BallotResolveResponse> {
+  return apiFetch<BallotResolveResponse>("/ballots/resolve", {
+    method: "POST",
+    body: JSON.stringify({ address_text: districtId }),
+  });
+}
+
+export function getCandidaciesByDistrict(
+  districtId: string
+): Promise<CandidacySummary[]> {
+  return apiFetch<CandidacySummary[]>(
+    `/candidacies?district_id=${districtId}`
+  );
+}
+
+export function getIssuesISR(): Promise<IssueTreeNode[]> {
+  return serverFetch<IssueTreeNode[]>("/issues");
+}
+
+export function getIssueISR(id: string): Promise<IssueDetail> {
+  return serverFetch<IssueDetail>(`/issues/${id}`);
 }

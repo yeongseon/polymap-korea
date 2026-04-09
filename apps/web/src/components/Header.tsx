@@ -43,7 +43,8 @@ export function Header() {
         <button
           className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 sm:hidden"
           onClick={() => setMenuOpen((o) => !o)}
-          aria-label="메뉴 열기"
+          aria-label={menuOpen ? "메뉴 닫기" : "메뉴 열기"}
+          aria-expanded={menuOpen}
         >
           {menuOpen ? (
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

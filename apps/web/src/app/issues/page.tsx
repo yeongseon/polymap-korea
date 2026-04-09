@@ -2,34 +2,19 @@
 
 import Link from "next/link";
 import { useIssues } from "@/lib/hooks";
-import type { IssueSummary } from "@/lib/types";
-
-function buildTree(issues: IssueSummary[]): Map<string | null, IssueSummary[]> {
-  const tree = new Map<string | null, IssueSummary[]>();
-  for (const issue of issues) {
-    const parentId = issue.parent_id ?? null;
-    const siblings = tree.get(parentId) ?? [];
-    siblings.push(issue);
-    tree.set(parentId, siblings);
-  }
-  return tree;
-}
+import type { IssueTreeNode } from "@/lib/types";
 
 function IssueNode({
   issue,
-  tree,
   depth,
 }: {
-  issue: IssueSummary;
-  tree: Map<string | null, IssueSummary[]>;
+  issue: IssueTreeNode;
   depth: number;
 }) {
-  const children = tree.get(issue.id) ?? [];
-
   return (
     <div>
       <Link
-        href={`/issues/${issue.slug}`}
+        href={`/issues/${issue.id}`}
         className={`group flex items-center gap-2 rounded-xl px-4 py-3 transition hover:bg-blue-50 ${
           depth === 0
             ? "border border-slate-200 bg-white shadow-sm"
@@ -49,9 +34,9 @@ function IssueNode({
         >
           {issue.name}
         </span>
-        {children.length > 0 && (
+        {issue.children.length > 0 && (
           <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500">
-            {children.length}개 하위
+            {issue.children.length}개 하위
           </span>
         )}
         <svg
@@ -69,10 +54,10 @@ function IssueNode({
         </svg>
       </Link>
 
-      {children.length > 0 && (
+      {issue.children.length > 0 && (
         <div className="mt-1.5 space-y-1.5 pl-5 border-l-2 border-slate-100 ml-4">
-          {children.map((child) => (
-            <IssueNode key={child.id} issue={child} tree={tree} depth={depth + 1} />
+          {issue.children.map((child) => (
+            <IssueNode key={child.id} issue={child} depth={depth + 1} />
           ))}
         </div>
       )}
@@ -106,9 +91,6 @@ export default function IssuesPage() {
     );
   }
 
-  const tree = buildTree(issues);
-  const roots = tree.get(null) ?? [];
-
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
       <div className="mb-8">
@@ -121,7 +103,7 @@ export default function IssuesPage() {
         </p>
       </div>
 
-      {roots.length === 0 ? (
+      {issues.length === 0 ? (
         <div className="rounded-2xl border-2 border-dashed border-slate-200 p-12 text-center">
           <p className="text-4xl">📋</p>
           <p className="mt-4 text-lg font-semibold text-slate-700">
@@ -133,8 +115,8 @@ export default function IssuesPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {roots.map((issue) => (
-            <IssueNode key={issue.id} issue={issue} tree={tree} depth={0} />
+          {issues.map((issue) => (
+            <IssueNode key={issue.id} issue={issue} depth={0} />
           ))}
         </div>
       )}

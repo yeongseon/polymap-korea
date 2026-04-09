@@ -62,7 +62,7 @@ export interface PartySummary {
   id: UUID;
   name_ko: string;
   abbreviation: string | null;
-  color: string | null;
+  color_hex: string | null;
 }
 
 export interface CandidacySummary {
@@ -120,10 +120,30 @@ export interface IssueSummary {
   parent_id: UUID | null;
 }
 
+export interface IssueTreeNode {
+  id: UUID;
+  name: string;
+  slug: string;
+  parent_id: UUID | null;
+  children: IssueTreeNode[];
+}
+
 export interface IssueRead extends IssueSummary {
   description: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface IssuePromiseSummary {
+  id: UUID;
+  candidacy_id: UUID;
+  title: string;
+  sort_order: number;
+  candidacy: CandidacySummary;
+}
+
+export interface IssueDetail extends IssueRead {
+  related_promises: IssuePromiseSummary[];
 }
 
 export interface SourceDocRead {
