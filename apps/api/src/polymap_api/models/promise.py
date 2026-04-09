@@ -4,7 +4,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
-from sqlalchemy import ForeignKey, Index, Integer, String, Text, text
+from sqlalchemy import ForeignKey, Index, Integer, JSON, String, Text, text
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from polymap_api.db import Base, TimestampMixin, UUIDPrimaryKeyMixin
@@ -42,6 +43,9 @@ class Promise(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         nullable=True,
     )
     sort_order: Mapped[int] = mapped_column(Integer, nullable=False, server_default="0")
+    metadata_: Mapped[dict[str, Any] | None] = mapped_column(
+        "metadata", JSON().with_variant(JSONB(astext_type=Text()), "postgresql"), nullable=True,
+    )
 
     candidacy: Mapped[Candidacy] = relationship(back_populates="promises")
     issue: Mapped[Issue | None] = relationship(back_populates="promises")
@@ -52,4 +56,6 @@ class Promise(UUIDPrimaryKeyMixin, TimestampMixin, Base):
             kwargs["body"] = kwargs.pop("description")
         if "body" not in kwargs and "title" in kwargs:
             kwargs["body"] = kwargs["title"]
+        if "metadata" in kwargs and "metadata_" not in kwargs:
+            kwargs["metadata_"] = kwargs.pop("metadata")
         super().__init__(**kwargs)
