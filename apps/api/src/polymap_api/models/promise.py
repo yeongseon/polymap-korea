@@ -15,15 +15,16 @@ if TYPE_CHECKING:
     from .source_doc import SourceDoc
 
 
+_PROMISE_BODY_SEARCH_INDEX = Index(
+    "ix_promise_body_tsv",
+    text("to_tsvector('simple', body)"),
+    postgresql_using="gin",
+).ddl_if(dialect="postgresql")
+
+
 class Promise(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "promise"
-    __table_args__ = (
-        Index(
-            "ix_promise_body_tsv",
-            text("to_tsvector('simple', body)"),
-            postgresql_using="gin",
-        ),
-    )
+    __table_args__ = (_PROMISE_BODY_SEARCH_INDEX,)
 
     candidacy_id: Mapped[UUID] = mapped_column(
         ForeignKey("candidacy.id", ondelete="CASCADE"),

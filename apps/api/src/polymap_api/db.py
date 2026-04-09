@@ -3,10 +3,9 @@ from __future__ import annotations
 
 from collections.abc import AsyncIterator
 from datetime import datetime
-from uuid import UUID
+from uuid import UUID, uuid4
 
-from sqlalchemy import DateTime, MetaData, func, text
-from sqlalchemy.dialects.postgresql import UUID as PGUUID
+from sqlalchemy import DateTime, MetaData, Uuid, func
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -27,9 +26,9 @@ class Base(DeclarativeBase):
 
 class UUIDPrimaryKeyMixin:
     id: Mapped[UUID] = mapped_column(
-        PGUUID(as_uuid=True),
+        Uuid(as_uuid=True),
         primary_key=True,
-        server_default=text("gen_random_uuid()"),
+        default=uuid4,
     )
 
 

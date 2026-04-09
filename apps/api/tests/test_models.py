@@ -1,3 +1,4 @@
+# ruff: noqa: I001,E501,SIM118
 from __future__ import annotations
 
 from sqlalchemy import UniqueConstraint
