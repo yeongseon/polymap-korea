@@ -16,6 +16,9 @@ import type {
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
 
+const SERVER_BASE_URL =
+  process.env.API_URL_INTERNAL ?? BASE_URL;
+
 const ISR_REVALIDATE = 300;
 
 async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
@@ -30,7 +33,7 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 async function serverFetch<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}`, {
+  const res = await fetch(`${SERVER_BASE_URL}${path}`, {
     headers: { "Content-Type": "application/json" },
     next: { revalidate: ISR_REVALIDATE },
   });
