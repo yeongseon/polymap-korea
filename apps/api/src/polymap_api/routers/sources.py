@@ -1,6 +1,7 @@
 # ruff: noqa: B008,TC002,TC003,E501
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -23,12 +24,21 @@ def _is_poll_related_source(source: SourceDoc) -> bool:
     return any(keyword in combined for keyword in _POLL_SOURCE_KEYWORDS)
 
 
+def _is_expired(source: SourceDoc) -> bool:
+    if source.public_expiry_at is None:
+        return False
+    public_expiry_at = source.public_expiry_at
+    if public_expiry_at.tzinfo is None:
+        public_expiry_at = public_expiry_at.replace(tzinfo=timezone.utc)
+    return public_expiry_at < datetime.now(timezone.utc)
+
+
 async def require_poll_source_visibility(
     source_id: UUID,
     db: AsyncSession = Depends(get_db),
 ) -> None:
     source = await db.get(SourceDoc, source_id)
-    if source is None or source.deleted_at is not None or source.visibility == "HIDDEN":
+    if source is None or source.deleted_at is not None or source.visibility == "HIDDEN" or _is_expired(source):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Source document not found")
     if not _is_poll_related_source(source):
         return
@@ -51,6 +61,6 @@ async def get_source(
     db: AsyncSession = Depends(get_db),
 ) -> SourceDoc:
     source = await db.get(SourceDoc, source_id)
-    if source is None or source.deleted_at is not None or source.visibility == "HIDDEN":
+    if source is None or source.deleted_at is not None or source.visibility == "HIDDEN" or _is_expired(source):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Source document not found")
     return source

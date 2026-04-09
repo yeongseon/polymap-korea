@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from polymap_api.deps import Pagination, get_db, get_pagination
-from polymap_api.middleware.content_guard import ensure_content_visible
+from polymap_api.middleware.content_guard import ensure_content_visible, is_content_blocked
 from polymap_api.models import Candidacy, Claim, Promise, Race
 from polymap_api.schemas import (
     CandidacySummary,
@@ -97,8 +97,16 @@ async def list_candidacies(
 
 
 @router.get("/{candidacy_id}", response_model=CandidacyDetail)
-async def get_candidacy(candidacy_id: UUID, db: AsyncSession = Depends(get_db)) -> Candidacy:
-    return await _get_candidacy_or_404(candidacy_id, db)
+async def get_candidacy(candidacy_id: UUID, db: AsyncSession = Depends(get_db)) -> Candidacy | dict[str, object]:
+    candidacy = await _get_candidacy_or_404(candidacy_id, db)
+    election_id = await db.scalar(select(Race.election_id).where(Race.id == candidacy.race_id))
+    if election_id is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Candidacy not found")
+    if await is_content_blocked("poll_result", election_id, db):
+        response = CandidacyDetail.model_validate(candidacy).model_dump()
+        response["claims"] = []
+        return response
+    return candidacy
 
 
 @router.get("/{candidacy_id}/promises", response_model=list[PromiseRead])

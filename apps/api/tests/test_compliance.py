@@ -149,6 +149,50 @@ async def test_source_doc_expiry_hides_document_and_records_audit(
 
 
 @pytest.mark.asyncio
+async def test_candidacy_detail_strips_claims_during_blackout(
+    client: AsyncClient,
+    db_session: AsyncSession,
+    seeded_db: dict[str, object],
+) -> None:
+    election_id = seeded_db["election"]
+    candidacy_id = seeded_db["candidacy"]
+    assert isinstance(election_id, uuid.UUID)
+    assert isinstance(candidacy_id, uuid.UUID)
+    now = datetime.now(SEOUL_TZ)
+    db_session.add(
+        ElectionWindow(
+            election_id=election_id,
+            content_type="poll_result",
+            blackout_start=now - timedelta(minutes=30),
+            blackout_end=now + timedelta(minutes=30),
+        )
+    )
+    await db_session.commit()
+
+    response = await client.get(f"/api/v1/candidacies/{candidacy_id}")
+
+    assert response.status_code == 200
+    assert response.json()["claims"] == []
+
+
+@pytest.mark.asyncio
+async def test_expired_source_doc_returns_404(
+    client: AsyncClient,
+    db_session: AsyncSession,
+    seeded_db: dict[str, object],
+) -> None:
+    source_doc = await db_session.get(SourceDoc, seeded_db["source_doc"])
+    assert source_doc is not None
+    source_doc.visibility = "VISIBLE"
+    source_doc.public_expiry_at = datetime.now(timezone.utc) - timedelta(minutes=1)
+    await db_session.commit()
+
+    response = await client.get(f"/api/v1/sources/{seeded_db['source_doc']}")
+
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
 async def test_content_guard_dependency_blocks_only_active_blackout(
     db_session: AsyncSession,
     seeded_db: dict[str, object],
@@ -171,4 +215,3 @@ async def test_content_guard_dependency_blocks_only_active_blackout(
 
     assert exc_info.value.status_code == 403
     await ensure_content_visible("candidate_docs", election_id, db_session)
-
