@@ -101,6 +101,11 @@ async def test_audit_log_creation_and_append_only_guard(
         await db_session.commit()
     await db_session.rollback()
 
+    await db_session.delete(audit_log)
+    with pytest.raises(ValueError, match="append-only"):
+        await db_session.commit()
+    await db_session.rollback()
+
 
 @pytest.mark.asyncio
 async def test_source_doc_expiry_hides_document_and_records_audit(
@@ -166,3 +171,4 @@ async def test_content_guard_dependency_blocks_only_active_blackout(
 
     assert exc_info.value.status_code == 403
     await ensure_content_visible("candidate_docs", election_id, db_session)
+
