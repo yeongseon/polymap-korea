@@ -45,13 +45,13 @@
 - **저장**: PostgreSQL (curated), OpenSearch (search), MinIO (raw archive)
 - **API**: FastAPI (REST + OpenAPI)
 - **Frontend**: Next.js 14 + TypeScript + Cytoscape.js
-- **Infra**: Docker Compose, Redis
+- **Infra**: Docker Compose
 
 ## 개발 환경
 
 ```bash
 make setup      # 의존성 설치 (uv, pnpm)
-make dev-infra  # 인프라 서비스 시작 (PostgreSQL, Redis, MinIO)
+make dev-infra  # core 프로파일 시작 (PostgreSQL, MinIO, Prefect, API, Web, Pipeline)
 make api        # API 서버 시작
 make web        # 웹 프론트엔드 시작
 make test       # 전체 테스트 실행

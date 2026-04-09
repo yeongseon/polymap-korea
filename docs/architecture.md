@@ -31,8 +31,8 @@ Issue #1 establishes the v1 monorepo foundation for a Korean local election vote
    - Prefect is the orchestration layer for ingestion, normalization, and publishing workflows.
 
 7. **Local runtime model**
-   - Next.js, FastAPI, and pipeline code run on the host machine.
-   - Docker is reserved for infrastructure dependencies: PostgreSQL, Redis, MinIO, OpenSearch, and Prefect server.
+   - Next.js, FastAPI, and pipeline code can run on the host machine for development.
+   - Docker Compose `core` profile includes all application services alongside infrastructure dependencies.
 
 ## Repository Layout
 
@@ -45,7 +45,8 @@ Issue #1 establishes the v1 monorepo foundation for a Korean local election vote
 
 ## Compose Profiles
 
-- `core`: PostgreSQL, Redis, MinIO
+- `core`: PostgreSQL, MinIO, Prefect server, API, Web, Pipeline worker
 - `search`: OpenSearch
 - `orchestrator`: Prefect server
+- `monitoring`: Prometheus, Grafana, postgres-exporter, node-exporter
 - `full`: everything above

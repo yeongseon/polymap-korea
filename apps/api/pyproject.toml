@@ -15,8 +15,8 @@ dependencies = [
     "pydantic>=2.10.0",
     "pydantic-settings>=2.6.0",
     "polymap-ontology",
-    "redis>=5.2.0",
     "httpx>=0.28.0",
+    "prometheus-fastapi-instrumentator>=7.0.0",
 ]
 
 [project.optional-dependencies]

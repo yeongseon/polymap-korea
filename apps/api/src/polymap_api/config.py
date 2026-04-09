@@ -13,7 +13,6 @@ class Settings(BaseSettings):
     app_version: str = "0.1.0"
     debug: bool = False
     database_url: str = "postgresql+asyncpg://polymap:polymap_dev@localhost:5432/polymap"
-    redis_url: str = "redis://localhost:6379/0"
     opensearch_url: str = "http://localhost:9200"
     s3_endpoint: str = "http://localhost:9000"
     s3_access_key: str = "polymap"
