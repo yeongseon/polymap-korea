@@ -6,10 +6,11 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from polymap_api.deps import Pagination, get_db, get_pagination
 from polymap_api.models import Election, Race
-from polymap_api.schemas import ElectionRead, ElectionSummary, RaceRead
+from polymap_api.schemas import ElectionDetail, ElectionSummary, RaceRead
 
 router = APIRouter(prefix="/elections", tags=["elections"])
 
@@ -29,9 +30,13 @@ async def list_elections(
     return list(result)
 
 
-@router.get("/{election_id}", response_model=ElectionRead)
+@router.get("/{election_id}", response_model=ElectionDetail)
 async def get_election(election_id: UUID, db: AsyncSession = Depends(get_db)) -> Election:
-    election = await db.get(Election, election_id)
+    election = await db.scalar(
+        select(Election)
+        .options(selectinload(Election.races))
+        .where(Election.id == election_id)
+    )
     if election is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Election not found")
     return election

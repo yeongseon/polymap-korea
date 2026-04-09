@@ -22,7 +22,10 @@ async def test_get_election_detail_and_races(client: AsyncClient, seeded_db: dic
     races_response = await client.get(f"/api/v1/elections/{seeded_db['election']}/races")
 
     assert detail_response.status_code == 200
-    assert detail_response.json()["id"] == str(seeded_db["election"])
+    detail_data = detail_response.json()
+    assert detail_data["id"] == str(seeded_db["election"])
+    assert len(detail_data["races"]) == 1
+    assert detail_data["races"][0]["id"] == str(seeded_db["race"])
 
     assert races_response.status_code == 200
     races = races_response.json()
