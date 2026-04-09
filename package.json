@@ -1,6 +1,7 @@
 {
   "name": "polymap-korea",
   "private": true,
+  "packageManager": "pnpm@9.15.9",
   "scripts": {
     "build": "pnpm --filter web build",
     "dev:web": "pnpm --filter web dev",
