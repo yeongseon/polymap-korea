@@ -3,11 +3,10 @@ from __future__ import annotations
 
 from datetime import datetime
 from typing import Any
-from uuid import UUID
+from uuid import UUID, uuid4
 
-from sqlalchemy import CheckConstraint, DateTime, Index, String, Text, func, text
+from sqlalchemy import JSON, CheckConstraint, DateTime, Index, String, Text, Uuid, func
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.dialects.postgresql import UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from polymap_api.db import Base
@@ -29,9 +28,9 @@ class AuditLog(Base):
     )
 
     id: Mapped[UUID] = mapped_column(
-        PGUUID(as_uuid=True),
+        Uuid(as_uuid=True),
         primary_key=True,
-        server_default=text("gen_random_uuid()"),
+        default=uuid4,
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -39,10 +38,13 @@ class AuditLog(Base):
         server_default=func.now(),
     )
     entity_type: Mapped[str] = mapped_column(String(100), nullable=False)
-    entity_id: Mapped[UUID] = mapped_column(PGUUID(as_uuid=True), nullable=False)
+    entity_id: Mapped[UUID] = mapped_column(Uuid(as_uuid=True), nullable=False)
     action: Mapped[str] = mapped_column(String(10), nullable=False)
     actor: Mapped[str | None] = mapped_column(Text, nullable=True)
-    diff: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
+    diff: Mapped[dict[str, Any] | None] = mapped_column(
+        JSONB().with_variant(JSON(), "sqlite"),
+        nullable=True,
+    )
 
     def __init__(self, **kwargs: Any) -> None:
         action = kwargs.get("action")

@@ -1,4 +1,4 @@
-# ruff: noqa: TC003,E501,F401
+# ruff: noqa: I001,TC003,E501,F401
 from __future__ import annotations
 
 from .audit_log import AuditLogRead
@@ -25,7 +25,7 @@ from .committee import (
     CommitteeAssignmentUpdate,
 )
 from .district import DistrictBase, DistrictCreate, DistrictRead, DistrictSummary, DistrictUpdate
-from .election import ElectionBase, ElectionCreate, ElectionRead, ElectionSummary, ElectionUpdate
+from .election import ElectionBase, ElectionCreate, ElectionDetail, ElectionRead, ElectionSummary, ElectionUpdate
 from .election_window import (
     ElectionWindowBase,
     ElectionWindowCreate,

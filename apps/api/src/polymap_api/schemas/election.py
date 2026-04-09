@@ -1,4 +1,4 @@
-# ruff: noqa: I001,TC002,TC003,E501,F401
+# ruff: noqa: I001,TC001,TC002,TC003,E501,F401
 from __future__ import annotations
 
 from datetime import date, datetime
@@ -7,6 +7,8 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field
 
 from polymap_ontology.enums import ElectionType
+
+from .race import RaceRead
 
 
 class ElectionBase(BaseModel):
@@ -33,6 +35,10 @@ class ElectionRead(ElectionBase):
     id: UUID
     created_at: datetime
     updated_at: datetime
+
+
+class ElectionDetail(ElectionRead):
+    races: list[RaceRead]
 
 
 class ElectionSummary(BaseModel):

@@ -17,7 +17,7 @@ class Party(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
     __tablename__ = "party"
     __table_args__ = (
         CheckConstraint(
-            "color_hex IS NULL OR color_hex ~ '^#[0-9A-Fa-f]{6}$'",
+            "color_hex IS NULL OR (length(color_hex) = 7 AND substr(color_hex, 1, 1) = '#')",
             name="color_hex_format",
         ),
     )

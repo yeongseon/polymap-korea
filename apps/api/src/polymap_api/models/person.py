@@ -4,7 +4,7 @@ from __future__ import annotations
 from datetime import date
 from typing import TYPE_CHECKING, Any
 
-from sqlalchemy import Enum, Index, String, Text, text
+from sqlalchemy import JSON, Enum, Index, String, Text, text
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -28,9 +28,9 @@ class Person(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
     photo_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     bio: Mapped[str | None] = mapped_column(Text, nullable=True)
     external_ids: Mapped[dict[str, Any]] = mapped_column(
-        JSONB,
+        JSONB().with_variant(JSON(), "sqlite"),
         nullable=False,
-        server_default=text("'{}'::jsonb"),
+        server_default=text("'{}'"),
     )
 
     candidacies: Mapped[list[Candidacy]] = relationship(back_populates="person")

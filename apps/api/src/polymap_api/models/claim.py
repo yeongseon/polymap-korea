@@ -16,15 +16,16 @@ if TYPE_CHECKING:
     from .source_doc import SourceDoc
 
 
+_CLAIM_CONTENT_SEARCH_INDEX = Index(
+    "ix_claim_content_tsv",
+    text("to_tsvector('simple', content)"),
+    postgresql_using="gin",
+).ddl_if(dialect="postgresql")
+
+
 class Claim(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "claim"
-    __table_args__ = (
-        Index(
-            "ix_claim_content_tsv",
-            text("to_tsvector('simple', content)"),
-            postgresql_using="gin",
-        ),
-    )
+    __table_args__ = (_CLAIM_CONTENT_SEARCH_INDEX,)
 
     source_doc_id: Mapped[UUID] = mapped_column(
         ForeignKey("source_doc.id", ondelete="CASCADE"),
