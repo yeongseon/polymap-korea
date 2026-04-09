@@ -88,22 +88,20 @@ class AssemblyAdapter(BaseAdapter):
                 "pSize": self.page_size,
                 **params,
             }
-            response = await self._request_with_retry(endpoint, request_params)
-            payload = response.json()
-            items, total_count = self._extract_items(payload, endpoint)
+            status_code, items, total_count = await self._fetch_with_retry(endpoint, request_params)
             if not items:
                 break
-            records.extend(self._to_raw_records(endpoint, request_params, response.status_code, items))
+            records.extend(self._to_raw_records(endpoint, request_params, status_code, items))
             if total_count is None or page_index * self.page_size >= total_count:
                 break
             page_index += 1
         return records
 
-    async def _request_with_retry(
+    async def _fetch_with_retry(
         self,
         endpoint: str,
         params: Mapping[str, Any],
-    ) -> httpx.Response:
+    ) -> tuple[int, list[dict[str, Any]], int | None]:
         last_error: Exception | None = None
         for attempt in range(1, self.max_retries + 1):
             await self.rate_limiter.acquire()
@@ -116,8 +114,12 @@ class AssemblyAdapter(BaseAdapter):
                     "Assembly response",
                     extra={"endpoint": endpoint, "status_code": response.status_code},
                 )
+                payload = response.json()
+                if not isinstance(payload, dict):
+                    raise ValueError(f"Unexpected response structure for {endpoint}")
+                items, total_count = self._extract_items(payload, endpoint)
                 self.circuit_breaker.record_success()
-                return response
+                return response.status_code, items, total_count
             except (httpx.HTTPError, httpx.TimeoutException, ValueError) as exc:
                 self.circuit_breaker.record_failure()
                 last_error = exc
@@ -131,7 +133,7 @@ class AssemblyAdapter(BaseAdapter):
     def _extract_items(self, payload: dict[str, Any], endpoint: str) -> tuple[list[dict[str, Any]], int | None]:
         dataset = payload.get(endpoint)
         if not isinstance(dataset, list):
-            return [], None
+            raise ValueError(f"Unexpected response structure for {endpoint}")
 
         items: list[dict[str, Any]] = []
         total_count: int | None = None
@@ -147,6 +149,8 @@ class AssemblyAdapter(BaseAdapter):
                     total_count = count_value
                 elif isinstance(count_value, str) and count_value.isdigit():
                     total_count = int(count_value)
+        if total_count is None and not items:
+            raise ValueError(f"Unexpected response structure for {endpoint}")
         return items, total_count
 
     def _to_raw_records(

@@ -102,23 +102,22 @@ class NecAdapter(BaseAdapter):
                 "pageNo": page_no,
                 **params,
             }
-            response = await self._request_with_retry(endpoint, request_params)
-            parsed = self._parse_xml_response(response.text)
+            status_code, parsed = await self._fetch_with_retry(endpoint, request_params)
             items = parsed["items"]
             if not items:
                 break
-            records.extend(self._to_raw_records(endpoint, request_params, response.status_code, items))
+            records.extend(self._to_raw_records(endpoint, request_params, status_code, items))
             total_count = parsed["total_count"]
             if total_count is None or page_no * self.default_num_rows >= total_count:
                 break
             page_no += 1
         return records
 
-    async def _request_with_retry(
+    async def _fetch_with_retry(
         self,
         endpoint: str,
         params: Mapping[str, Any],
-    ) -> httpx.Response:
+    ) -> tuple[int, dict[str, Any]]:
         last_error: Exception | None = None
         for attempt in range(1, self.max_retries + 1):
             await self.rate_limiter.acquire()
@@ -131,9 +130,10 @@ class NecAdapter(BaseAdapter):
                     "NEC response",
                     extra={"endpoint": endpoint, "status_code": response.status_code},
                 )
+                parsed = self._parse_xml_response(response.text)
                 self.circuit_breaker.record_success()
-                return response
-            except (httpx.HTTPError, httpx.TimeoutException) as exc:
+                return response.status_code, parsed
+            except (httpx.HTTPError, httpx.TimeoutException, ElementTree.ParseError, ValueError) as exc:
                 self.circuit_breaker.record_failure()
                 last_error = exc
                 if attempt == self.max_retries:

@@ -16,6 +16,7 @@ POLLING_TIERS = [
     PollingTier(ElectionPhase.PRE_CANDIDACY, 86400, ["nec", "assembly"]),
     PollingTier(ElectionPhase.CANDIDACY_REGISTRATION, 3600, ["nec"]),
     PollingTier(ElectionPhase.CAMPAIGN, 3600, ["nec", "assembly", "local_council"]),
+    PollingTier(ElectionPhase.POLLING_BAN, 86400, ["nec"]),
     PollingTier(ElectionPhase.ELECTION_DAY, 300, ["nec"]),
     PollingTier(ElectionPhase.POST_ELECTION, 86400, ["nec"]),
 ]

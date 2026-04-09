@@ -1,8 +1,7 @@
-from __future__ import annotations
-
-import pytest
 import httpx
+import pytest
 import respx
+from typing import Any
 
 from common.base_adapter import RawRecord
 from common.circuit_breaker import CircuitBreaker
@@ -69,7 +68,7 @@ def _make_adapter(
     client: httpx.AsyncClient,
     rate_limiter: TokenBucketRateLimiter,
     circuit_breaker: CircuitBreaker,
-    **kwargs: object,
+    **kwargs: Any,
 ) -> AssemblyAdapter:
     return AssemblyAdapter(
         api_key="test-key",
@@ -91,6 +90,8 @@ async def test_fetch_members(rate_limiter: TokenBucketRateLimiter, circuit_break
     assert len(records) == 2
     assert all(isinstance(r, RawRecord) for r in records)
     assert records[0].source_system == "assembly"
+    assert isinstance(records[0].data, dict)
+    assert isinstance(records[1].data, dict)
     assert records[0].data["HG_NM"] == "이재명"
     assert records[1].data["HG_NM"] == "한동훈"
 
@@ -104,6 +105,7 @@ async def test_fetch_bills(rate_limiter: TokenBucketRateLimiter, circuit_breaker
             records = await adapter.fetch_bills("이재명")
 
     assert len(records) == 1
+    assert isinstance(records[0].data, dict)
     assert records[0].data["BILL_ID"] == "PRC_A2B3C4D5"
     assert records[0].data["BILL_NM"] == "지방자치법 개정안"
 
@@ -137,6 +139,25 @@ async def test_retry_on_server_error(rate_limiter: TokenBucketRateLimiter, circu
         route = respx.get(url__startswith=BASE_URL)
         route.side_effect = [
             httpx.Response(503, text="Service Unavailable"),
+            httpx.Response(200, json=MEMBERS_RESPONSE),
+        ]
+        async with httpx.AsyncClient(base_url=BASE_URL) as client:
+            adapter = _make_adapter(
+                client, rate_limiter, circuit_breaker,
+                max_retries=3, base_delay=0.01,
+            )
+            records = await adapter.fetch_members()
+
+    assert len(records) == 2
+    assert route.call_count == 2
+
+
+@pytest.mark.asyncio
+async def test_retry_on_malformed_json(rate_limiter: TokenBucketRateLimiter, circuit_breaker: CircuitBreaker) -> None:
+    with respx.mock:
+        route = respx.get(url__startswith=BASE_URL)
+        route.side_effect = [
+            httpx.Response(200, text="not-json"),
             httpx.Response(200, json=MEMBERS_RESPONSE),
         ]
         async with httpx.AsyncClient(base_url=BASE_URL) as client:

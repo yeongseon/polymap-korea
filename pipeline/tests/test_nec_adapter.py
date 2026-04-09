@@ -1,8 +1,7 @@
-from __future__ import annotations
-
-import pytest
 import httpx
+import pytest
 import respx
+from typing import Any
 
 from common.base_adapter import RawRecord
 from common.circuit_breaker import CircuitBreaker
@@ -82,7 +81,7 @@ def _make_adapter(
     client: httpx.AsyncClient,
     rate_limiter: TokenBucketRateLimiter,
     circuit_breaker: CircuitBreaker,
-    **kwargs: object,
+    **kwargs: Any,
 ) -> NecAdapter:
     return NecAdapter(
         api_key="test-key",
@@ -104,6 +103,8 @@ async def test_fetch_candidates(rate_limiter: TokenBucketRateLimiter, circuit_br
     assert len(records) == 2
     assert all(isinstance(r, RawRecord) for r in records)
     assert records[0].source_system == "nec"
+    assert isinstance(records[0].data, dict)
+    assert isinstance(records[1].data, dict)
     assert records[0].data["hanglNm"] == "홍길동"
     assert records[1].data["hanglNm"] == "김영희"
     assert all(r.response_hash != "" for r in records)
@@ -118,6 +119,7 @@ async def test_fetch_election_codes(rate_limiter: TokenBucketRateLimiter, circui
             records = await adapter.fetch_election_codes()
 
     assert len(records) == 1
+    assert isinstance(records[0].data, dict)
     assert records[0].data["sgId"] == "20260603"
 
 
@@ -138,6 +140,25 @@ async def test_retry_on_failure(rate_limiter: TokenBucketRateLimiter, circuit_br
         route = respx.get(url__startswith=BASE_URL)
         route.side_effect = [
             httpx.Response(500, text="Internal Server Error"),
+            httpx.Response(200, text=ELECTION_CODES_XML),
+        ]
+        async with httpx.AsyncClient(base_url=BASE_URL) as client:
+            adapter = _make_adapter(
+                client, rate_limiter, circuit_breaker,
+                max_retries=3, base_delay=0.01,
+            )
+            records = await adapter.fetch_election_codes()
+
+    assert len(records) == 1
+    assert route.call_count == 2
+
+
+@pytest.mark.asyncio
+async def test_retry_on_malformed_xml(rate_limiter: TokenBucketRateLimiter, circuit_breaker: CircuitBreaker) -> None:
+    with respx.mock:
+        route = respx.get(url__startswith=BASE_URL)
+        route.side_effect = [
+            httpx.Response(200, text="<response><body>broken"),
             httpx.Response(200, text=ELECTION_CODES_XML),
         ]
         async with httpx.AsyncClient(base_url=BASE_URL) as client:

@@ -72,14 +72,14 @@ class LocalCouncilAdapter(BaseAdapter):
 
     async def health_check(self) -> bool:
         try:
-            response = await self._request_with_retry(
+            status_code, _, _ = await self._fetch_with_retry(
                 "openapi/localCouncil/memberInfo.do",
                 {"pIndex": 1, "pSize": 1, "councilType": "metropolitan"},
             )
         except Exception:
             logger.exception("Local council health check failed")
             return False
-        return response.status_code == 200
+        return status_code == 200
 
     async def _fetch_paginated(self, endpoint: str, params: Mapping[str, Any]) -> list[RawRecord]:
         page_index = 1
@@ -92,22 +92,20 @@ class LocalCouncilAdapter(BaseAdapter):
                 "pSize": self.page_size,
                 **params,
             }
-            response = await self._request_with_retry(endpoint, request_params)
-            payload = response.json()
-            items, total_count = self._extract_items(payload)
+            status_code, items, total_count = await self._fetch_with_retry(endpoint, request_params)
             if not items:
                 break
-            records.extend(self._to_raw_records(endpoint, request_params, response.status_code, items))
+            records.extend(self._to_raw_records(endpoint, request_params, status_code, items))
             if total_count is None or page_index * self.page_size >= total_count:
                 break
             page_index += 1
         return records
 
-    async def _request_with_retry(
+    async def _fetch_with_retry(
         self,
         endpoint: str,
         params: Mapping[str, Any],
-    ) -> httpx.Response:
+    ) -> tuple[int, list[dict[str, Any]], int | None]:
         last_error: Exception | None = None
         for attempt in range(1, self.max_retries + 1):
             await self.rate_limiter.acquire()
@@ -123,8 +121,12 @@ class LocalCouncilAdapter(BaseAdapter):
                     "Local council response",
                     extra={"endpoint": endpoint, "status_code": response.status_code},
                 )
+                payload = response.json()
+                if not isinstance(payload, dict):
+                    raise ValueError(f"Unexpected response structure for {endpoint}")
+                items, total_count = self._extract_items(payload)
                 self.circuit_breaker.record_success()
-                return response
+                return response.status_code, items, total_count
             except (httpx.HTTPError, httpx.TimeoutException, ValueError) as exc:
                 self.circuit_breaker.record_failure()
                 last_error = exc
@@ -156,7 +158,7 @@ class LocalCouncilAdapter(BaseAdapter):
                         if isinstance(count_value, str) and count_value.isdigit():
                             return rows, int(count_value)
                         return rows, None
-        return [], None
+        raise ValueError("Unexpected response structure for local council response")
 
     def _to_raw_records(
         self,

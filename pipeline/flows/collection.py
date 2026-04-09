@@ -109,15 +109,48 @@ async def collect_nec_data(
 @flow(name="collect-assembly-data")
 async def collect_assembly_data() -> dict[str, list[RawRecord]]:
     adapter = AssemblyAdapter()
+    members: list[RawRecord] = []
+    all_bills: list[RawRecord] = []
+    all_votes: list[RawRecord] = []
+    all_committees: list[RawRecord] = []
     try:
         members = await fetch_assembly_members(adapter)
+        for member_record in members:
+            if not isinstance(member_record.data, dict):
+                continue
+            name = str(member_record.data.get("HG_NM", "")).strip()
+            if not name:
+                continue
+            try:
+                bills = await fetch_assembly_bills(adapter, name)
+                all_bills.extend(bills)
+                for bill_record in bills:
+                    if not isinstance(bill_record.data, dict):
+                        continue
+                    bill_id = str(bill_record.data.get("BILL_ID", "")).strip()
+                    if not bill_id:
+                        continue
+                    try:
+                        all_votes.extend(await fetch_assembly_votes(adapter, bill_id))
+                    except CircuitBreakerOpenError:
+                        logger.warning("Circuit breaker open during assembly vote fetch for %s", bill_id)
+                        break
+                all_committees.extend(await fetch_assembly_committee_activities(adapter, name))
+            except CircuitBreakerOpenError:
+                logger.warning("Circuit breaker open during assembly detail fetch for %s", name)
+                break
     except CircuitBreakerOpenError:
         logger.error("Assembly circuit breaker open — skipping collection")
-        return {"members": []}
+        return {"members": [], "bills": [], "votes": [], "committees": []}
     finally:
         await adapter.aclose()
 
-    return {"members": members}
+    return {
+        "members": members,
+        "bills": all_bills,
+        "votes": all_votes,
+        "committees": all_committees,
+    }
 
 
 @flow(name="collect-local-council-data")

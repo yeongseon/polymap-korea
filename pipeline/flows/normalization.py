@@ -9,6 +9,7 @@ from common.base_adapter import RawRecord
 from normalization.entity_resolver import EntityCandidate, EntityResolver
 from normalization.normalizer import (
     AssemblyNormalizer,
+    LocalCouncilNormalizer,
     NecNormalizer,
     NormalizedResult,
 )
@@ -25,6 +26,12 @@ def run_nec_normalization(records: list[RawRecord]) -> list[NormalizedResult]:
 @task
 def run_assembly_normalization(records: list[RawRecord]) -> list[NormalizedResult]:
     normalizer = AssemblyNormalizer()
+    return normalizer.normalize(records)
+
+
+@task
+def run_local_council_normalization(records: list[RawRecord]) -> list[NormalizedResult]:
+    normalizer = LocalCouncilNormalizer()
     return normalizer.normalize(records)
 
 
@@ -66,6 +73,8 @@ def normalize_batch(
         normalized = run_nec_normalization(records)
     elif source == "assembly":
         normalized = run_assembly_normalization(records)
+    elif source == "local_council":
+        normalized = run_local_council_normalization(records)
     else:
         logger.warning("Unknown source: %s", source)
         return {"normalized": [], "resolved": [], "errors": []}
@@ -81,5 +90,34 @@ def normalize_batch(
         "errors": [
             {"type": r.entity_type, "field_errors": [e.field for e in r.errors]}
             for r in errors
+        ],
+    }
+
+
+@flow(name="normalize-and-resolve-all")
+def normalize_and_resolve_all(source_records: dict[str, list[RawRecord]]) -> dict[str, Any]:
+    normalized_by_source: dict[str, list[NormalizedResult]] = {
+        "nec": run_nec_normalization(source_records.get("nec", [])),
+        "assembly": run_assembly_normalization(source_records.get("assembly", [])),
+        "local_council": run_local_council_normalization(source_records.get("local_council", [])),
+    }
+    all_normalized = [result for results in normalized_by_source.values() for result in results]
+    valid = [result for result in all_normalized if result.is_valid]
+    errors = [result for result in all_normalized if not result.is_valid]
+    resolved = run_entity_resolution(valid)
+
+    return {
+        "normalized": {
+            source: [{"type": result.entity_type, "data": result.data} for result in results if result.is_valid]
+            for source, results in normalized_by_source.items()
+        },
+        "resolved": resolved,
+        "errors": [
+            {
+                "source": result.source_record.source_system,
+                "type": result.entity_type,
+                "field_errors": [error.field for error in result.errors],
+            }
+            for result in errors
         ],
     }
