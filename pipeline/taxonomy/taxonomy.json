@@ -1,0 +1,62 @@
+[
+  {
+    "slug": "economy",
+    "name": "경제",
+    "children": [
+      {"slug": "economy-jobs", "name": "일자리"},
+      {"slug": "economy-housing", "name": "주거·부동산"},
+      {"slug": "economy-smallbiz", "name": "소상공인·자영업"}
+    ]
+  },
+  {
+    "slug": "welfare",
+    "name": "복지",
+    "children": [
+      {"slug": "welfare-elderly", "name": "노인 복지"},
+      {"slug": "welfare-childcare", "name": "보육·육아"},
+      {"slug": "welfare-disability", "name": "장애인 복지"}
+    ]
+  },
+  {
+    "slug": "education",
+    "name": "교육",
+    "children": [
+      {"slug": "education-public", "name": "공교육"},
+      {"slug": "education-lifelong", "name": "평생교육"}
+    ]
+  },
+  {
+    "slug": "environment",
+    "name": "환경",
+    "children": [
+      {"slug": "environment-climate", "name": "기후·에너지"},
+      {"slug": "environment-waste", "name": "폐기물·재활용"}
+    ]
+  },
+  {
+    "slug": "transport",
+    "name": "교통",
+    "children": [
+      {"slug": "transport-public", "name": "대중교통"},
+      {"slug": "transport-road", "name": "도로·주차"}
+    ]
+  },
+  {
+    "slug": "safety",
+    "name": "안전",
+    "children": [
+      {"slug": "safety-disaster", "name": "재난·방재"},
+      {"slug": "safety-crime", "name": "치안·범죄예방"}
+    ]
+  },
+  {
+    "slug": "culture",
+    "name": "문화·관광",
+    "children": []
+  },
+  {
+    "slug": "administration",
+    "name": "행정·자치",
+    "children": []
+  }
+]

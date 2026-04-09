@@ -3,81 +3,81 @@
 
 pm:economy a pm:Issue ;
     skos:prefLabel "경제"@ko ;
-    skos:narrower pm:economy_jobs, pm:economy_housing, pm:economy_smallbiz .
+    skos:narrower pm:economy-jobs, pm:economy-housing, pm:economy-smallbiz .
 
-pm:economy_jobs a pm:Issue ;
+pm:economy-jobs a pm:Issue ;
     skos:prefLabel "일자리"@ko ;
     skos:broader pm:economy .
 
-pm:economy_housing a pm:Issue ;
+pm:economy-housing a pm:Issue ;
     skos:prefLabel "주거·부동산"@ko ;
     skos:broader pm:economy .
 
-pm:economy_smallbiz a pm:Issue ;
+pm:economy-smallbiz a pm:Issue ;
     skos:prefLabel "소상공인·자영업"@ko ;
     skos:broader pm:economy .
 
 pm:welfare a pm:Issue ;
     skos:prefLabel "복지"@ko ;
-    skos:narrower pm:welfare_elderly, pm:welfare_childcare, pm:welfare_disability .
+    skos:narrower pm:welfare-elderly, pm:welfare-childcare, pm:welfare-disability .
 
-pm:welfare_elderly a pm:Issue ;
+pm:welfare-elderly a pm:Issue ;
     skos:prefLabel "노인 복지"@ko ;
     skos:broader pm:welfare .
 
-pm:welfare_childcare a pm:Issue ;
+pm:welfare-childcare a pm:Issue ;
     skos:prefLabel "보육·육아"@ko ;
     skos:broader pm:welfare .
 
-pm:welfare_disability a pm:Issue ;
+pm:welfare-disability a pm:Issue ;
     skos:prefLabel "장애인 복지"@ko ;
     skos:broader pm:welfare .
 
 pm:education a pm:Issue ;
     skos:prefLabel "교육"@ko ;
-    skos:narrower pm:education_public, pm:education_lifelong .
+    skos:narrower pm:education-public, pm:education-lifelong .
 
-pm:education_public a pm:Issue ;
+pm:education-public a pm:Issue ;
     skos:prefLabel "공교육"@ko ;
     skos:broader pm:education .
 
-pm:education_lifelong a pm:Issue ;
+pm:education-lifelong a pm:Issue ;
     skos:prefLabel "평생교육"@ko ;
     skos:broader pm:education .
 
 pm:environment a pm:Issue ;
     skos:prefLabel "환경"@ko ;
-    skos:narrower pm:environment_climate, pm:environment_waste .
+    skos:narrower pm:environment-climate, pm:environment-waste .
 
-pm:environment_climate a pm:Issue ;
+pm:environment-climate a pm:Issue ;
     skos:prefLabel "기후·에너지"@ko ;
     skos:broader pm:environment .
 
-pm:environment_waste a pm:Issue ;
+pm:environment-waste a pm:Issue ;
     skos:prefLabel "폐기물·재활용"@ko ;
     skos:broader pm:environment .
 
 pm:transport a pm:Issue ;
     skos:prefLabel "교통"@ko ;
-    skos:narrower pm:transport_public, pm:transport_road .
+    skos:narrower pm:transport-public, pm:transport-road .
 
-pm:transport_public a pm:Issue ;
+pm:transport-public a pm:Issue ;
     skos:prefLabel "대중교통"@ko ;
     skos:broader pm:transport .
 
-pm:transport_road a pm:Issue ;
+pm:transport-road a pm:Issue ;
     skos:prefLabel "도로·주차"@ko ;
     skos:broader pm:transport .
 
 pm:safety a pm:Issue ;
     skos:prefLabel "안전"@ko ;
-    skos:narrower pm:safety_disaster, pm:safety_crime .
+    skos:narrower pm:safety-disaster, pm:safety-crime .
 
-pm:safety_disaster a pm:Issue ;
+pm:safety-disaster a pm:Issue ;
     skos:prefLabel "재난·방재"@ko ;
     skos:broader pm:safety .
 
-pm:safety_crime a pm:Issue ;
+pm:safety-crime a pm:Issue ;
     skos:prefLabel "치안·범죄예방"@ko ;
     skos:broader pm:safety .
 
