@@ -81,3 +81,33 @@ async def test_candidacy_promises_include_metadata_field(
     assert response.status_code == 200
     data = response.json()
     assert data[0]["metadata"] == {"issue_slugs": ["administration"]}
+
+
+def test_promise_schema_accepts_metadata_key_on_input() -> None:
+    """Verify that inbound payloads using 'metadata' (not 'metadata_') are accepted."""
+    from polymap_api.schemas.promise import PromiseCreate
+
+    payload = {
+        "candidacy_id": "00000000-0000-0000-0000-000000000001",
+        "title": "Test promise",
+        "body": "Test body",
+        "metadata": {"issue_slugs": ["economy-jobs"]},
+    }
+    obj = PromiseCreate.model_validate(payload)
+    assert obj.metadata_ == {"issue_slugs": ["economy-jobs"]}
+    dumped = obj.model_dump(by_alias=True)
+    assert dumped["metadata"] == {"issue_slugs": ["economy-jobs"]}
+
+
+def test_promise_schema_accepts_metadata_underscore_on_input() -> None:
+    """Verify that inbound payloads using 'metadata_' are also accepted."""
+    from polymap_api.schemas.promise import PromiseCreate
+
+    payload = {
+        "candidacy_id": "00000000-0000-0000-0000-000000000001",
+        "title": "Test promise",
+        "body": "Test body",
+        "metadata_": {"issue_slugs": ["welfare-elderly"]},
+    }
+    obj = PromiseCreate.model_validate(payload)
+    assert obj.metadata_ == {"issue_slugs": ["welfare-elderly"]}

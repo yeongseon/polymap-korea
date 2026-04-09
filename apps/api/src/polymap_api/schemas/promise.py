@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, model_validator
 
 
 class PromiseBase(BaseModel):
@@ -21,7 +21,7 @@ class PromiseBase(BaseModel):
     metadata_: dict[str, Any] | None = Field(
         default=None,
         serialization_alias="metadata",
-        validation_alias="metadata_",
+        validation_alias=AliasChoices("metadata_", "metadata"),
     )
 
     @model_validator(mode="before")
