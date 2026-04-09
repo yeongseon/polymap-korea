@@ -1,5 +1,25 @@
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
+_TAXONOMY_JSON = Path(__file__).resolve().parents[2] / "taxonomy" / "taxonomy.json"
+
+
+def _load_taxonomy_slugs() -> set[str]:
+    with open(_TAXONOMY_JSON, encoding="utf-8") as f:
+        taxonomy = json.load(f)
+    slugs: set[str] = set()
+    for parent in taxonomy:
+        children = parent.get("children", [])
+        if children:
+            for child in children:
+                slugs.add(child["slug"])
+        else:
+            slugs.add(parent["slug"])
+    return slugs
+
+
 ISSUE_KEYWORDS: dict[str, list[str]] = {
     "economy-jobs": ["일자리", "고용", "취업", "실업", "채용", "노동"],
     "economy-housing": ["주거", "부동산", "아파트", "집값", "임대", "전세", "월세", "주택"],
@@ -18,3 +38,17 @@ ISSUE_KEYWORDS: dict[str, list[str]] = {
     "culture": ["문화", "관광", "축제", "공연", "전시", "체육"],
     "administration": ["행정", "자치", "민원", "공무원", "예산", "재정"],
 }
+
+_taxonomy_slugs = _load_taxonomy_slugs()
+_keyword_slugs = set(ISSUE_KEYWORDS.keys())
+_missing_from_keywords = _taxonomy_slugs - _keyword_slugs
+_extra_in_keywords = _keyword_slugs - _taxonomy_slugs
+if _missing_from_keywords or _extra_in_keywords:
+    parts = []
+    if _missing_from_keywords:
+        parts.append(f"missing from ISSUE_KEYWORDS: {sorted(_missing_from_keywords)}")
+    if _extra_in_keywords:
+        parts.append(f"extra in ISSUE_KEYWORDS: {sorted(_extra_in_keywords)}")
+    raise RuntimeError(
+        f"ISSUE_KEYWORDS out of sync with taxonomy.json — {'; '.join(parts)}"
+    )
