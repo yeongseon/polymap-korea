@@ -6,12 +6,24 @@ from httpx import AsyncClient
 from polymap_api.config import settings
 
 
+SNAPSHOT_PAYLOAD = {
+    "version": "0.1.0",
+    "schema_version": "2026-04-09",
+    "generated_at": "2026-04-10T00:00:00+00:00",
+    "entity_catalog": [
+        {"table": "elections", "description": "선거 목록", "priority": "high"},
+    ],
+    "entity_count": 1,
+    "publish_targets": ["api_index", "static_snapshot"],
+}
+
+
 @pytest.mark.asyncio
 async def test_publish_snapshot_accepts_admin_requests(client: AsyncClient) -> None:
     response = await client.post(
         "/api/v1/admin/publish/snapshot",
         headers={"Authorization": f"Bearer {settings.admin_api_key}"},
-        json={"snapshot": {"version": "0.1.0"}},
+        json=SNAPSHOT_PAYLOAD,
     )
 
     assert response.status_code == 202
@@ -29,7 +41,7 @@ async def test_publish_snapshot_requires_configured_admin_key(client: AsyncClien
         response = await client.post(
             "/api/v1/admin/publish/snapshot",
             headers={"Authorization": "Bearer some-key"},
-            json={"snapshot": {"version": "0.1.0"}},
+            json=SNAPSHOT_PAYLOAD,
         )
     finally:
         settings.admin_api_key = original_key

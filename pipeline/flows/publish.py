@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import os
 from pathlib import Path
 from typing import Any
 
@@ -35,6 +36,7 @@ def index_snapshot(
     api_url: str | None,
     api_endpoint: str,
     timeout_seconds: float,
+    admin_api_key: str | None = os.getenv("POLYMAP_ADMIN_API_KEY", ""),
 ) -> dict[str, str]:
     resolved_api_url = resolve_api_url(api_url)
     if resolved_api_url is None:
@@ -46,6 +48,7 @@ def index_snapshot(
             api_url=resolved_api_url,
             endpoint=api_endpoint,
             timeout_seconds=timeout_seconds,
+            admin_api_key=admin_api_key,
         )
     except httpx.HTTPError as exc:
         logger.warning("Publish API indexing failed: %s", exc)

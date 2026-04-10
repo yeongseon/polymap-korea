@@ -61,6 +61,7 @@ def index_snapshot_via_api(
     api_url: str,
     endpoint: str = DEFAULT_API_ENDPOINT,
     timeout_seconds: float = 30.0,
+    admin_api_key: str | None = os.getenv("POLYMAP_ADMIN_API_KEY", ""),
     client: httpx.Client | None = None,
 ) -> str:
     normalized_base = api_url.rstrip("/")
@@ -68,9 +69,10 @@ def index_snapshot_via_api(
     target_url = f"{normalized_base}{normalized_endpoint}"
     owns_client = client is None
     http_client = client or httpx.Client(timeout=timeout_seconds)
+    headers = {"Authorization": f"Bearer {admin_api_key}"} if admin_api_key else None
 
     try:
-        response = http_client.post(target_url, json={"snapshot": data})
+        response = http_client.post(target_url, json=data, headers=headers)
         response.raise_for_status()
     finally:
         if owns_client:

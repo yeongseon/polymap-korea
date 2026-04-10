@@ -1,4 +1,3 @@
-// See scripts/generate-types.sh for OpenAPI contract generation.
 export type UUID = string;
 
 export interface PersonSummary {

@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
-    "generate:types": "bash ./scripts/generate-types.sh"
+    "generate:types": "bash ../../scripts/generate-contracts.sh"
   },
   "dependencies": {
     "@tanstack/react-query": "^5",
