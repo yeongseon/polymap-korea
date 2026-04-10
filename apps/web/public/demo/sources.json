@@ -1,0 +1,42 @@
+[
+  {
+    "id": "doc-kim-policy-001",
+    "title": "김민수 서울시장 예비후보 정책브리프 1호",
+    "url": "https://www.nec.go.kr/site/nec/ex/bbs/View.do?cbIdx=1106&bcIdx=156789",
+    "publisher": "중앙선거관리위원회",
+    "published_at": "2026-02-20T09:00:00+09:00",
+    "doc_type": "policy_brief"
+  },
+  {
+    "id": "doc-kim-interview-101",
+    "title": "심야버스 개편 성과를 말하다",
+    "url": "https://www.hani.co.kr/arti/politics/politics_general/1234567.html",
+    "publisher": "한겨레",
+    "published_at": "2026-03-04T09:30:00+09:00",
+    "doc_type": "media_interview"
+  },
+  {
+    "id": "doc-lee-policy-002",
+    "title": "이지은 후보 교통 공약 발표문",
+    "url": "https://www.yna.co.kr/view/AKR20260312012300004",
+    "publisher": "연합뉴스",
+    "published_at": "2026-02-22T11:00:00+09:00",
+    "doc_type": "press_release"
+  },
+  {
+    "id": "doc-han-policy-002",
+    "title": "서울 공공건물 에너지 전환 제안서",
+    "url": "https://www.khan.co.kr/politics/election/article/202602251000001",
+    "publisher": "경향신문",
+    "published_at": "2026-02-25T10:00:00+09:00",
+    "doc_type": "policy_brief"
+  },
+  {
+    "id": "doc-park-policy-002",
+    "title": "홍대입구역 보행안전 특화거리 추진 자료",
+    "url": "https://news.kbs.co.kr/news/pc/view/view.do?ncd=8012345",
+    "publisher": "KBS 뉴스",
+    "published_at": "2026-02-27T09:00:00+09:00",
+    "doc_type": "local_news"
+  }
+]

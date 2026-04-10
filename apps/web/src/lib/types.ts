@@ -1,3 +1,4 @@
+// See scripts/generate-types.sh for OpenAPI contract generation.
 export type UUID = string;
 
 export interface PersonSummary {
@@ -148,15 +149,24 @@ export interface IssueDetail extends IssueRead {
 
 export interface SourceDocRead {
   id: UUID;
-  kind: string;
   title: string;
   url: string | null;
+  publisher: string;
   published_at: string | null;
-  content_hash: string | null;
-  raw_s3_key: string | null;
-  created_at: string;
-  updated_at: string;
-  deleted_at: string | null;
+  doc_type: string;
+}
+
+export interface ComparisonIssuePositions {
+  issue_name: string;
+  positions: Array<{
+    candidacy_id: UUID;
+    promises: PromiseRead[];
+  }>;
+}
+
+export interface ComparisonResult {
+  candidacy_ids: UUID[];
+  by_issue: Record<string, ComparisonIssuePositions>;
 }
 
 export interface SearchResponse {

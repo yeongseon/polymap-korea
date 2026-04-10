@@ -31,11 +31,6 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v4
 
-      - name: Create workspace root for local packages
-        run: |
-          printf '[tool.uv.workspace]\nmembers = ["apps/api", "pipeline", "packages/ontology"]\n\n[tool.uv.sources]\npolymap-ontology = { workspace = true }\n' > pyproject.toml
-        working-directory: .
-
       - name: Sync dependencies
         run: uv sync --all-extras
 
@@ -79,6 +74,10 @@ jobs:
 
       - name: Typecheck web app
         run: pnpm --filter web exec tsc --noEmit
+        working-directory: .
+
+      - name: Test web app
+        run: pnpm --filter web test
         working-directory: .
 
       - name: Build web app
