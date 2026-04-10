@@ -55,7 +55,7 @@ async def test_poll_related_source_is_blocked_during_blackout(
 ) -> None:
     source = await db_session.get(SourceDoc, seeded_db["source_doc"])
     assert source is not None
-    source.title = "여론조사 결과 요약"
+    source.is_poll_result = True
 
     now = datetime.now(SEOUL_TZ)
     db_session.add(

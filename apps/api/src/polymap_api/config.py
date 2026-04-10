@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import ClassVar
 
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 _PROJECT_ROOT = Path(__file__).resolve().parents[4]
@@ -12,8 +13,8 @@ AI_DISCLAIMER_KO = "이 요약은 중앙선거관리위원회 등 원문 자료�
 class Settings(BaseSettings):
     app_version: str = "0.1.0"
     debug: bool = False
+    cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:3000"])
     database_url: str = "postgresql+asyncpg://polymap:polymap_dev@localhost:5432/polymap"
-    cors_origins: list[str] = ["http://localhost:3000"]
     opensearch_url: str = "http://localhost:9200"
     admin_api_key: str = "polymap-dev-admin-key-change-me"
     juso_api_key: str = ""

@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from polymap_api.deps import get_db
@@ -14,14 +14,6 @@ from polymap_api.models import Candidacy, Claim, Promise, Race, SourceDoc
 from polymap_api.schemas import SourceDocRead
 
 router = APIRouter(prefix="/sources", tags=["sources"])
-
-_POLL_SOURCE_KEYWORDS = ("poll", "survey", "여론조사", "지지도")
-
-
-def _is_poll_related_source(source: SourceDoc) -> bool:
-    fields = (source.title, source.url, source.raw_s3_key)
-    combined = " ".join(value.casefold() for value in fields if value)
-    return any(keyword in combined for keyword in _POLL_SOURCE_KEYWORDS)
 
 
 def _is_expired(source: SourceDoc) -> bool:
@@ -40,7 +32,7 @@ async def require_poll_source_visibility(
     source = await db.get(SourceDoc, source_id)
     if source is None or source.deleted_at is not None or source.visibility == "HIDDEN" or _is_expired(source):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Source document not found")
-    if not _is_poll_related_source(source):
+    if not source.is_poll_result:
         return
 
     election_id = await db.scalar(
@@ -48,7 +40,12 @@ async def require_poll_source_visibility(
         .join(Candidacy, Candidacy.race_id == Race.id)
         .outerjoin(Claim, Claim.candidacy_id == Candidacy.id)
         .outerjoin(Promise, Promise.candidacy_id == Candidacy.id)
-        .where((Claim.source_doc_id == source_id) | (Promise.source_doc_id == source_id))
+        .where(
+            or_(
+                Claim.source_doc_id == source_id,
+                Promise.source_doc_id == source_id,
+            )
+        )
     )
     if election_id is not None:
         await ensure_content_visible(content_type="poll_result", election_id=election_id, db=db)

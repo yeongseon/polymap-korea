@@ -16,6 +16,7 @@ class SourceDocBase(BaseModel):
     title: str = Field(min_length=1, max_length=300)
     url: str | None = Field(default=None, max_length=1000)
     published_at: datetime | None = None
+    is_poll_result: bool = False
     content_hash: str | None = Field(default=None, max_length=128)
     raw_s3_key: str | None = Field(default=None, max_length=500)
 

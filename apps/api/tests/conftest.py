@@ -127,6 +127,7 @@ def sample_instances(sample_ids: dict[str, uuid.UUID]) -> dict[str, object]:
         candidacy_id=sample_ids["candidacy"],
         source_doc_id=sample_ids["source_doc"],
         claim_type=ClaimType.SOURCED_CLAIM,
+        is_legally_restricted=False,
         content="Will add new subway lines.",
     )
     issue = Issue(
@@ -327,7 +328,16 @@ async def seeded_db(
         candidacy_id=sample_ids["candidacy"],
         source_doc_id=sample_ids["source_doc"],
         claim_type=ClaimType.SOURCED_CLAIM,
+        is_legally_restricted=False,
         content="Will add new subway lines.",
+    )
+    restricted_claim = Claim(
+        id=uuid.uuid4(),
+        candidacy_id=sample_ids["candidacy"],
+        source_doc_id=sample_ids["source_doc"],
+        claim_type=ClaimType.DISPUTED,
+        is_legally_restricted=True,
+        content="Polling lead widened to 10 points.",
     )
     committee_assignment = CommitteeAssignment(
         id=sample_ids["committee_assignment"],
@@ -359,6 +369,7 @@ async def seeded_db(
             issue,
             promise,
             claim,
+            restricted_claim,
             committee_assignment,
             bill_sponsorship,
         ]

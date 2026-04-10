@@ -13,6 +13,7 @@ from polymap_api.deps import get_db
 from polymap_api.models import ElectionWindow
 
 SEOUL_TZ = ZoneInfo("Asia/Seoul")
+LEGALLY_RESTRICTED_CONTENT_TYPES = frozenset({"poll_result"})
 
 
 def current_seoul_time() -> datetime:
@@ -26,6 +27,8 @@ def _to_seoul(value: datetime) -> datetime:
 
 
 async def is_content_blocked(content_type: str, election_id: UUID, db: AsyncSession) -> bool:
+    if content_type not in LEGALLY_RESTRICTED_CONTENT_TYPES:
+        return False
     result = await db.scalars(
         select(ElectionWindow).where(
             ElectionWindow.election_id == election_id,
@@ -41,5 +44,7 @@ async def ensure_content_visible(
     election_id: UUID,
     db: AsyncSession = Depends(get_db),
 ) -> None:
+    if content_type not in LEGALLY_RESTRICTED_CONTENT_TYPES:
+        return
     if await is_content_blocked(content_type=content_type, election_id=election_id, db=db):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Content is currently blocked by election blackout window")

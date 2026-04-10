@@ -201,7 +201,7 @@ async def test_candidacy_detail_strips_claims_during_blackout(
     response = await client.get(f"/api/v1/candidacies/{candidacy_id}")
 
     assert response.status_code == 200
-    assert response.json()["claims"] == []
+    assert [claim["content"] for claim in response.json()["claims"]] == ["Will add new subway lines."]
 
 
 @pytest.mark.asyncio

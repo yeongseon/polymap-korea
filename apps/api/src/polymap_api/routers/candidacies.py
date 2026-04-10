@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from polymap_api.deps import Pagination, get_db, get_pagination
-from polymap_api.middleware.content_guard import ensure_content_visible, is_content_blocked
+from polymap_api.middleware.content_guard import is_content_blocked
 from polymap_api.models import Candidacy, Claim, Promise, Race
 from polymap_api.schemas import (
     CandidacySummary,
@@ -63,13 +63,13 @@ async def _get_candidacy_or_404(candidacy_id: UUID, db: AsyncSession) -> Candida
 async def require_poll_result_visibility_for_claims(
     candidacy_id: UUID,
     db: AsyncSession = Depends(get_db),
-) -> None:
+) -> bool:
     election_id = await db.scalar(
         select(Race.election_id).join(Candidacy, Candidacy.race_id == Race.id).where(Candidacy.id == candidacy_id)
     )
     if election_id is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Candidacy not found")
-    await ensure_content_visible(content_type="poll_result", election_id=election_id, db=db)
+    return await is_content_blocked("poll_result", election_id, db)
 
 
 @router.get("", response_model=list[CandidacySummary])
@@ -104,7 +104,7 @@ async def get_candidacy(candidacy_id: UUID, db: AsyncSession = Depends(get_db)) 
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Candidacy not found")
     if await is_content_blocked("poll_result", election_id, db):
         response = CandidacyDetail.model_validate(candidacy).model_dump()
-        response["claims"] = []
+        response["claims"] = [claim for claim in response["claims"] if not claim["is_legally_restricted"]]
         return response
     return candidacy
 
@@ -124,10 +124,12 @@ async def list_candidacy_promises(candidacy_id: UUID, db: AsyncSession = Depends
 @router.get("/{candidacy_id}/claims", response_model=list[ClaimRead])
 async def list_candidacy_claims(
     candidacy_id: UUID,
-    _: None = Depends(require_poll_result_visibility_for_claims),
+    poll_result_blocked: bool = Depends(require_poll_result_visibility_for_claims),
     db: AsyncSession = Depends(get_db),
 ) -> list[Claim]:
     await _get_candidacy_or_404(candidacy_id, db)
     statement = select(Claim).where(Claim.candidacy_id == candidacy_id).order_by(Claim.created_at.asc())
+    if poll_result_blocked:
+        statement = statement.where(Claim.is_legally_restricted.is_(False))
     result = await db.scalars(statement)
     return list(result)

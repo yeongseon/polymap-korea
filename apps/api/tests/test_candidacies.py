@@ -65,5 +65,7 @@ async def test_candidacy_claims_are_blocked_during_poll_blackout(
     claims_response = await client.get(f"/api/v1/candidacies/{seeded_db['candidacy']}/claims")
     detail_response = await client.get(f"/api/v1/candidacies/{seeded_db['candidacy']}")
 
-    assert claims_response.status_code == 403
+    assert claims_response.status_code == 200
+    assert [claim["content"] for claim in claims_response.json()] == ["Will add new subway lines."]
     assert detail_response.status_code == 200
+    assert [claim["content"] for claim in detail_response.json()["claims"]] == ["Will add new subway lines."]
