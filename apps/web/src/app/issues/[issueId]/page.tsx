@@ -1,21 +1,14 @@
-import { getIssueISR } from "@/lib/api";
+import { demoIssueIds } from "@/lib/demo-params";
 import { IssueDetailClient } from "./issue-detail-client";
 
-export const revalidate = 300;
+export function generateStaticParams() {
+  return demoIssueIds.map((issueId) => ({ issueId }));
+}
 
-export default async function IssueDetailPage({
+export default function IssueDetailPage({
   params,
 }: {
-  params: Promise<{ issueId: string }>;
+  params: { issueId: string };
 }) {
-  const { issueId } = await params;
-
-  let issue;
-  try {
-    issue = await getIssueISR(issueId);
-  } catch {
-    issue = null;
-  }
-
-  return <IssueDetailClient issue={issue} />;
+  return <IssueDetailClient issueId={params.issueId} />;
 }
