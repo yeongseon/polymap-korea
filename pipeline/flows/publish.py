@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-import os
 from pathlib import Path
 from typing import Any
 
@@ -13,6 +12,7 @@ from publish.snapshot import (
     DEFAULT_SNAPSHOT_DIR,
     collect_curated_data as collect_curated_snapshot_data,
     index_snapshot_via_api,
+    resolve_admin_api_key,
     resolve_api_url,
     write_snapshot as persist_snapshot,
 )
@@ -36,7 +36,7 @@ def index_snapshot(
     api_url: str | None,
     api_endpoint: str,
     timeout_seconds: float,
-    admin_api_key: str | None = os.getenv("POLYMAP_ADMIN_API_KEY", ""),
+    admin_api_key: str | None = None,
 ) -> dict[str, str]:
     resolved_api_url = resolve_api_url(api_url)
     if resolved_api_url is None:
@@ -63,9 +63,11 @@ def publish_snapshot(
     api_url: str | None = None,
     api_endpoint: str = DEFAULT_API_ENDPOINT,
     timeout_seconds: float = 30.0,
+    admin_api_key: str | None = None,
 ) -> dict[str, str]:
     if output_dir is None:
         output_dir = DEFAULT_SNAPSHOT_DIR
+    resolved_key = resolve_admin_api_key(admin_api_key)
     data = collect_curated_data()
     snapshot_path = write_snapshot(data, output_dir)
     result = {
@@ -73,5 +75,13 @@ def publish_snapshot(
         "path": str(snapshot_path),
         "snapshot_target": "json",
     }
-    result.update(index_snapshot(data, api_url=api_url, api_endpoint=api_endpoint, timeout_seconds=timeout_seconds))
+    result.update(
+        index_snapshot(
+            data,
+            api_url=api_url,
+            api_endpoint=api_endpoint,
+            timeout_seconds=timeout_seconds,
+            admin_api_key=resolved_key,
+        )
+    )
     return result

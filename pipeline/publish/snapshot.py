@@ -56,20 +56,27 @@ def resolve_api_url(api_url: str | None = None) -> str | None:
     return normalized or None
 
 
+def resolve_admin_api_key(admin_api_key: str | None = None) -> str:
+    if admin_api_key is not None:
+        return admin_api_key
+    return os.getenv("POLYMAP_ADMIN_API_KEY", "")
+
+
 def index_snapshot_via_api(
     data: dict[str, Any],
     api_url: str,
     endpoint: str = DEFAULT_API_ENDPOINT,
     timeout_seconds: float = 30.0,
-    admin_api_key: str | None = os.getenv("POLYMAP_ADMIN_API_KEY", ""),
+    admin_api_key: str | None = None,
     client: httpx.Client | None = None,
 ) -> str:
+    resolved_key = resolve_admin_api_key(admin_api_key)
     normalized_base = api_url.rstrip("/")
     normalized_endpoint = endpoint if endpoint.startswith("/") else f"/{endpoint}"
     target_url = f"{normalized_base}{normalized_endpoint}"
     owns_client = client is None
     http_client = client or httpx.Client(timeout=timeout_seconds)
-    headers = {"Authorization": f"Bearer {admin_api_key}"} if admin_api_key else None
+    headers = {"Authorization": f"Bearer {resolved_key}"} if resolved_key else None
 
     try:
         response = http_client.post(target_url, json=data, headers=headers)
@@ -87,6 +94,7 @@ __all__ = [
     "DEFAULT_SNAPSHOT_DIR",
     "collect_curated_data",
     "index_snapshot_via_api",
+    "resolve_admin_api_key",
     "resolve_api_url",
     "write_snapshot",
 ]
