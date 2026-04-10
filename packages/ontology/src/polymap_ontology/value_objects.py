@@ -6,6 +6,8 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class PersonName(BaseModel):
+    """Normalized bilingual person naming fields for future shared schema reuse."""
+
     model_config = ConfigDict(str_strip_whitespace=True)
 
     name_ko: str = Field(min_length=1, max_length=200)
@@ -13,6 +15,8 @@ class PersonName(BaseModel):
 
 
 class DateRange(BaseModel):
+    """Immutable date interval used by ontology constraints and downstream validators."""
+
     model_config = ConfigDict(frozen=True)
 
     start_date: date
