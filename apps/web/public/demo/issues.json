@@ -86,19 +86,6 @@
       "updated_at": "2026-04-01T09:00:00+09:00",
       "related_promises": [
         {
-          "id": "promise-kim-jobs",
-          "candidacy_id": "candidacy-kim-minsu",
-          "title": "청년·경력전환자를 위한 서울형 미래일자리 5만 개 조성",
-          "sort_order": 1,
-          "candidacy": {
-            "id": "candidacy-kim-minsu",
-            "person_id": "person-kim-minsu",
-            "race_id": "race-seoul-mayor-2026",
-            "status": "registered",
-            "candidate_number": 1
-          }
-        },
-        {
           "id": "promise-lee-finance",
           "candidacy_id": "candidacy-lee-jieun",
           "title": "창업·재도전 기업을 위한 서울 혁신금융 허브 조성",
@@ -182,21 +169,7 @@
       "description": "돌봄, 보육, 청년·어르신 지원 정책을 다루는 데모 이슈입니다.",
       "created_at": "2025-12-15T09:00:00+09:00",
       "updated_at": "2026-04-01T09:00:00+09:00",
-      "related_promises": [
-        {
-          "id": "promise-choi-childcare",
-          "candidacy_id": "candidacy-choi-seoyeon",
-          "title": "마포형 초등 저녁돌봄센터 3곳 신설",
-          "sort_order": 1,
-          "candidacy": {
-            "id": "candidacy-choi-seoyeon",
-            "person_id": "person-choi-seoyeon",
-            "race_id": "race-mapo-council-2026",
-            "status": "registered",
-            "candidate_number": 2
-          }
-        }
-      ]
+      "related_promises": []
     },
     {
       "id": "issue-welfare-childcare",
@@ -243,21 +216,7 @@
       "description": "대중교통, 보행환경, 환승 인프라 등 이동권 정책을 비교합니다.",
       "created_at": "2025-12-15T09:00:00+09:00",
       "updated_at": "2026-04-01T09:00:00+09:00",
-      "related_promises": [
-        {
-          "id": "promise-lee-transport",
-          "candidacy_id": "candidacy-lee-jieun",
-          "title": "심야버스 증편과 환승거점형 GTX 연계 버스 도입",
-          "sort_order": 2,
-          "candidacy": {
-            "id": "candidacy-lee-jieun",
-            "person_id": "person-lee-jieun",
-            "race_id": "race-seoul-mayor-2026",
-            "status": "registered",
-            "candidate_number": 2
-          }
-        }
-      ]
+      "related_promises": []
     },
     {
       "id": "issue-transport-public",
@@ -304,21 +263,7 @@
       "description": "도시 탄소중립, 재생에너지, 자원순환을 다루는 데모 이슈입니다.",
       "created_at": "2025-12-15T09:00:00+09:00",
       "updated_at": "2026-04-01T09:00:00+09:00",
-      "related_promises": [
-        {
-          "id": "promise-han-climate",
-          "candidacy_id": "candidacy-han-doyun",
-          "title": "공공건물 태양광 확대와 건물에너지 데이터 공개",
-          "sort_order": 2,
-          "candidacy": {
-            "id": "candidacy-han-doyun",
-            "person_id": "person-han-doyun",
-            "race_id": "race-seoul-mayor-2026",
-            "status": "registered",
-            "candidate_number": 3
-          }
-        }
-      ]
+      "related_promises": []
     },
     {
       "id": "issue-environment-climate",
