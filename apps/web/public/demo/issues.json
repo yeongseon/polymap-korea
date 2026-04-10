@@ -1,0 +1,372 @@
+{
+  "tree": [
+    {
+      "id": "issue-economy",
+      "name": "경제",
+      "slug": "economy",
+      "parent_id": null,
+      "children": [
+        {
+          "id": "issue-economy-jobs",
+          "name": "일자리",
+          "slug": "economy-jobs",
+          "parent_id": "issue-economy",
+          "children": []
+        },
+        {
+          "id": "issue-economy-smallbiz",
+          "name": "소상공인·자영업",
+          "slug": "economy-smallbiz",
+          "parent_id": "issue-economy",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "issue-welfare",
+      "name": "복지",
+      "slug": "welfare",
+      "parent_id": null,
+      "children": [
+        {
+          "id": "issue-welfare-childcare",
+          "name": "보육·육아",
+          "slug": "welfare-childcare",
+          "parent_id": "issue-welfare",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "issue-transport",
+      "name": "교통",
+      "slug": "transport",
+      "parent_id": null,
+      "children": [
+        {
+          "id": "issue-transport-public",
+          "name": "대중교통",
+          "slug": "transport-public",
+          "parent_id": "issue-transport",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "issue-environment",
+      "name": "환경",
+      "slug": "environment",
+      "parent_id": null,
+      "children": [
+        {
+          "id": "issue-environment-climate",
+          "name": "기후·에너지",
+          "slug": "environment-climate",
+          "parent_id": "issue-environment",
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "issue-administration",
+      "name": "행정·자치",
+      "slug": "administration",
+      "parent_id": null,
+      "children": []
+    }
+  ],
+  "details": [
+    {
+      "id": "issue-economy",
+      "name": "경제",
+      "slug": "economy",
+      "parent_id": null,
+      "description": "지역 일자리, 소상공인, 첨단산업 유치 등 도시 경제 전반을 다루는 데모 이슈입니다.",
+      "created_at": "2025-12-15T09:00:00+09:00",
+      "updated_at": "2026-04-01T09:00:00+09:00",
+      "related_promises": [
+        {
+          "id": "promise-kim-jobs",
+          "candidacy_id": "candidacy-kim-minsu",
+          "title": "청년·경력전환자를 위한 서울형 미래일자리 5만 개 조성",
+          "sort_order": 1,
+          "candidacy": {
+            "id": "candidacy-kim-minsu",
+            "person_id": "person-kim-minsu",
+            "race_id": "race-seoul-mayor-2026",
+            "status": "registered",
+            "candidate_number": 1
+          }
+        },
+        {
+          "id": "promise-lee-finance",
+          "candidacy_id": "candidacy-lee-jieun",
+          "title": "창업·재도전 기업을 위한 서울 혁신금융 허브 조성",
+          "sort_order": 1,
+          "candidacy": {
+            "id": "candidacy-lee-jieun",
+            "person_id": "person-lee-jieun",
+            "race_id": "race-seoul-mayor-2026",
+            "status": "registered",
+            "candidate_number": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "issue-economy-jobs",
+      "name": "일자리",
+      "slug": "economy-jobs",
+      "parent_id": "issue-economy",
+      "description": "청년, 플랫폼 노동자, 중장년 전환교육 등 고용 정책을 비교합니다.",
+      "created_at": "2025-12-15T09:00:00+09:00",
+      "updated_at": "2026-04-01T09:00:00+09:00",
+      "related_promises": [
+        {
+          "id": "promise-kim-jobs",
+          "candidacy_id": "candidacy-kim-minsu",
+          "title": "청년·경력전환자를 위한 서울형 미래일자리 5만 개 조성",
+          "sort_order": 1,
+          "candidacy": {
+            "id": "candidacy-kim-minsu",
+            "person_id": "person-kim-minsu",
+            "race_id": "race-seoul-mayor-2026",
+            "status": "registered",
+            "candidate_number": 1
+          }
+        },
+        {
+          "id": "promise-han-platform",
+          "candidacy_id": "candidacy-han-doyun",
+          "title": "플랫폼 노동자 공제회 설립과 공정수수료 협약 추진",
+          "sort_order": 1,
+          "candidacy": {
+            "id": "candidacy-han-doyun",
+            "person_id": "person-han-doyun",
+            "race_id": "race-seoul-mayor-2026",
+            "status": "registered",
+            "candidate_number": 3
+          }
+        }
+      ]
+    },
+    {
+      "id": "issue-economy-smallbiz",
+      "name": "소상공인·자영업",
+      "slug": "economy-smallbiz",
+      "parent_id": "issue-economy",
+      "description": "골목상권 임대료 안정, 온라인 판로, 지역화폐 확대 정책을 비교합니다.",
+      "created_at": "2025-12-15T09:00:00+09:00",
+      "updated_at": "2026-04-01T09:00:00+09:00",
+      "related_promises": [
+        {
+          "id": "promise-park-market",
+          "candidacy_id": "candidacy-park-jungho",
+          "title": "합정·망원 골목상권 공공주차장과 배송거점 확충",
+          "sort_order": 1,
+          "candidacy": {
+            "id": "candidacy-park-jungho",
+            "person_id": "person-park-jungho",
+            "race_id": "race-mapo-council-2026",
+            "status": "registered",
+            "candidate_number": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "issue-welfare",
+      "name": "복지",
+      "slug": "welfare",
+      "parent_id": null,
+      "description": "돌봄, 보육, 청년·어르신 지원 정책을 다루는 데모 이슈입니다.",
+      "created_at": "2025-12-15T09:00:00+09:00",
+      "updated_at": "2026-04-01T09:00:00+09:00",
+      "related_promises": [
+        {
+          "id": "promise-choi-childcare",
+          "candidacy_id": "candidacy-choi-seoyeon",
+          "title": "마포형 초등 저녁돌봄센터 3곳 신설",
+          "sort_order": 1,
+          "candidacy": {
+            "id": "candidacy-choi-seoyeon",
+            "person_id": "person-choi-seoyeon",
+            "race_id": "race-mapo-council-2026",
+            "status": "registered",
+            "candidate_number": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "issue-welfare-childcare",
+      "name": "보육·육아",
+      "slug": "welfare-childcare",
+      "parent_id": "issue-welfare",
+      "description": "초등 방과후, 긴급돌봄, 학부모 생활지원 정책을 비교합니다.",
+      "created_at": "2025-12-15T09:00:00+09:00",
+      "updated_at": "2026-04-01T09:00:00+09:00",
+      "related_promises": [
+        {
+          "id": "promise-choi-childcare",
+          "candidacy_id": "candidacy-choi-seoyeon",
+          "title": "마포형 초등 저녁돌봄센터 3곳 신설",
+          "sort_order": 1,
+          "candidacy": {
+            "id": "candidacy-choi-seoyeon",
+            "person_id": "person-choi-seoyeon",
+            "race_id": "race-mapo-council-2026",
+            "status": "registered",
+            "candidate_number": 2
+          }
+        },
+        {
+          "id": "promise-oh-ai-learning",
+          "candidacy_id": "candidacy-oh-harin",
+          "title": "AI 학습진단 기반 기초학력·돌봄 연계 시스템 도입",
+          "sort_order": 1,
+          "candidacy": {
+            "id": "candidacy-oh-harin",
+            "person_id": "person-oh-harin",
+            "race_id": "race-seoul-superintendent-2026",
+            "status": "registered",
+            "candidate_number": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "issue-transport",
+      "name": "교통",
+      "slug": "transport",
+      "parent_id": null,
+      "description": "대중교통, 보행환경, 환승 인프라 등 이동권 정책을 비교합니다.",
+      "created_at": "2025-12-15T09:00:00+09:00",
+      "updated_at": "2026-04-01T09:00:00+09:00",
+      "related_promises": [
+        {
+          "id": "promise-lee-transport",
+          "candidacy_id": "candidacy-lee-jieun",
+          "title": "심야버스 증편과 환승거점형 GTX 연계 버스 도입",
+          "sort_order": 2,
+          "candidacy": {
+            "id": "candidacy-lee-jieun",
+            "person_id": "person-lee-jieun",
+            "race_id": "race-seoul-mayor-2026",
+            "status": "registered",
+            "candidate_number": 2
+          }
+        }
+      ]
+    },
+    {
+      "id": "issue-transport-public",
+      "name": "대중교통",
+      "slug": "transport-public",
+      "parent_id": "issue-transport",
+      "description": "지하철 혼잡도, 버스 배차, 무장애 환승정책을 비교합니다.",
+      "created_at": "2025-12-15T09:00:00+09:00",
+      "updated_at": "2026-04-01T09:00:00+09:00",
+      "related_promises": [
+        {
+          "id": "promise-lee-transport",
+          "candidacy_id": "candidacy-lee-jieun",
+          "title": "심야버스 증편과 환승거점형 GTX 연계 버스 도입",
+          "sort_order": 2,
+          "candidacy": {
+            "id": "candidacy-lee-jieun",
+            "person_id": "person-lee-jieun",
+            "race_id": "race-seoul-mayor-2026",
+            "status": "registered",
+            "candidate_number": 2
+          }
+        },
+        {
+          "id": "promise-park-walk",
+          "candidacy_id": "candidacy-park-jungho",
+          "title": "홍대입구역~합정역 보행안전 특화거리 조성",
+          "sort_order": 2,
+          "candidacy": {
+            "id": "candidacy-park-jungho",
+            "person_id": "person-park-jungho",
+            "race_id": "race-mapo-council-2026",
+            "status": "registered",
+            "candidate_number": 1
+          }
+        }
+      ]
+    },
+    {
+      "id": "issue-environment",
+      "name": "환경",
+      "slug": "environment",
+      "parent_id": null,
+      "description": "도시 탄소중립, 재생에너지, 자원순환을 다루는 데모 이슈입니다.",
+      "created_at": "2025-12-15T09:00:00+09:00",
+      "updated_at": "2026-04-01T09:00:00+09:00",
+      "related_promises": [
+        {
+          "id": "promise-han-climate",
+          "candidacy_id": "candidacy-han-doyun",
+          "title": "공공건물 태양광 확대와 건물에너지 데이터 공개",
+          "sort_order": 2,
+          "candidacy": {
+            "id": "candidacy-han-doyun",
+            "person_id": "person-han-doyun",
+            "race_id": "race-seoul-mayor-2026",
+            "status": "registered",
+            "candidate_number": 3
+          }
+        }
+      ]
+    },
+    {
+      "id": "issue-environment-climate",
+      "name": "기후·에너지",
+      "slug": "environment-climate",
+      "parent_id": "issue-environment",
+      "description": "탄소중립 예산과 재생에너지 전환 속도를 비교합니다.",
+      "created_at": "2025-12-15T09:00:00+09:00",
+      "updated_at": "2026-04-01T09:00:00+09:00",
+      "related_promises": [
+        {
+          "id": "promise-han-climate",
+          "candidacy_id": "candidacy-han-doyun",
+          "title": "공공건물 태양광 확대와 건물에너지 데이터 공개",
+          "sort_order": 2,
+          "candidacy": {
+            "id": "candidacy-han-doyun",
+            "person_id": "person-han-doyun",
+            "race_id": "race-seoul-mayor-2026",
+            "status": "registered",
+            "candidate_number": 3
+          }
+        }
+      ]
+    },
+    {
+      "id": "issue-administration",
+      "name": "행정·자치",
+      "slug": "administration",
+      "parent_id": null,
+      "description": "예산 공개, 주민참여, 디지털 행정혁신 등을 비교하는 데모 이슈입니다.",
+      "created_at": "2025-12-15T09:00:00+09:00",
+      "updated_at": "2026-04-01T09:00:00+09:00",
+      "related_promises": [
+        {
+          "id": "promise-kim-budget",
+          "candidacy_id": "candidacy-kim-minsu",
+          "title": "동네 단위 참여예산 2배 확대와 예산집행 공개 대시보드 구축",
+          "sort_order": 2,
+          "candidacy": {
+            "id": "candidacy-kim-minsu",
+            "person_id": "person-kim-minsu",
+            "race_id": "race-seoul-mayor-2026",
+            "status": "registered",
+            "candidate_number": 1
+          }
+        }
+      ]
+    }
+  ]
+}
