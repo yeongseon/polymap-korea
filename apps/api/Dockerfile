@@ -29,6 +29,11 @@ COPY --from=builder /opt/venv /opt/venv
 COPY apps/api/alembic.ini ./alembic.ini
 COPY apps/api/alembic ./alembic
 
+RUN adduser --disabled-password --gecos "" appuser \
+    && chown -R appuser:appuser /app /opt/venv
+
+USER appuser
+
 EXPOSE 8000
 
-CMD ["uvicorn", "polymap_api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "alembic upgrade head && exec uvicorn polymap_api.main:app --host 0.0.0.0 --port 8000"]

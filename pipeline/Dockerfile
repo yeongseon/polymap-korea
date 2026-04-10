@@ -32,4 +32,9 @@ WORKDIR /app
 
 COPY --from=builder /opt/venv /opt/venv
 
+RUN adduser --disabled-password --gecos "" appuser \
+    && chown -R appuser:appuser /app /opt/venv
+
+USER appuser
+
 CMD ["prefect", "worker", "start", "--pool", "polymap-pool"]

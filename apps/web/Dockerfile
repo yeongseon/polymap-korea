@@ -28,8 +28,14 @@ ENV NODE_ENV=production \
     PORT=3000 \
     HOSTNAME=0.0.0.0
 
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
 COPY --from=builder /app/apps/web/.next/standalone ./
 COPY --from=builder /app/apps/web/.next/static ./.next/static
+
+RUN chown -R appuser:appgroup /app
+
+USER appuser
 
 EXPOSE 3000
 
