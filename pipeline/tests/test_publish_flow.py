@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime
 from pathlib import Path
 
 import httpx
@@ -8,6 +9,29 @@ import pytest
 
 from flows.publish import publish_snapshot
 from publish.snapshot import index_snapshot_via_api, resolve_api_url
+
+
+def test_publish_snapshot_manifest_contains_entity_catalog(tmp_path: Path) -> None:
+    result = publish_snapshot(output_dir=tmp_path, api_url=None)
+
+    snapshot_path = Path(result["path"])
+    payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
+
+    assert payload["version"] == "0.1.0"
+    assert payload["publish_targets"]
+    generated_at = payload["generated_at"]
+    assert isinstance(generated_at, str)
+    assert datetime.fromisoformat(generated_at)
+
+    entity_catalog = payload["entity_catalog"]
+    assert isinstance(entity_catalog, list)
+    assert entity_catalog
+    assert payload["entity_count"] == len(entity_catalog)
+    assert all(
+        isinstance(entity, dict)
+        and {"table", "description", "priority"}.issubset(entity)
+        for entity in entity_catalog
+    )
 
 
 def test_publish_snapshot_writes_snapshot_when_api_not_configured(tmp_path: Path) -> None:
@@ -20,6 +44,7 @@ def test_publish_snapshot_writes_snapshot_when_api_not_configured(tmp_path: Path
     assert snapshot_path.exists()
     payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
     assert payload["version"] == "0.1.0"
+    assert payload["entity_count"] == len(payload["entity_catalog"])
 
 
 def test_publish_snapshot_indexes_via_api(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

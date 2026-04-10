@@ -16,18 +16,26 @@ DEFAULT_API_ENDPOINT = "/api/v1/admin/publish/snapshot"
 
 
 def collect_curated_data() -> dict[str, Any]:
+    entity_catalog = [
+        {"table": "elections", "description": "선거 목록", "priority": "high"},
+        {"table": "districts", "description": "선거구 행정구역", "priority": "high"},
+        {"table": "persons", "description": "후보자 인물 정보", "priority": "high"},
+        {"table": "parties", "description": "정당 정보", "priority": "medium"},
+        {"table": "races", "description": "선거 경선 단위", "priority": "high"},
+        {"table": "candidacies", "description": "후보 등록 정보", "priority": "high"},
+        {"table": "promises", "description": "후보 공약", "priority": "high"},
+        {"table": "claims", "description": "후보 관련 주장/팩트체크", "priority": "medium"},
+        {"table": "source_docs", "description": "출처 문서", "priority": "medium"},
+        {"table": "issues", "description": "정책 이슈 분류", "priority": "medium"},
+    ]
+
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "version": "0.1.0",
-        "tables": [
-            "persons",
-            "parties",
-            "elections",
-            "districts",
-            "races",
-            "candidacies",
-            "promises",
-        ],
+        "schema_version": "2026-04-09",
+        "entity_catalog": entity_catalog,
+        "entity_count": len(entity_catalog),
+        "publish_targets": ["api_index", "static_snapshot"],
     }
 
 
