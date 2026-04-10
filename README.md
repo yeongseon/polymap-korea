@@ -50,13 +50,17 @@
 ## 개발 환경
 
 ```bash
-make setup      # 의존성 설치 (uv, pnpm)
+uv sync --all-extras --package polymap-api --package polymap-pipeline
+pnpm install
+
 make dev-infra  # core 프로파일 시작 (PostgreSQL, MinIO, Prefect, API, Web, Pipeline)
 make api        # API 서버 시작
 make web        # 웹 프론트엔드 시작
 make test       # 전체 테스트 실행
 make lint       # 전체 린트 실행
 ```
+
+루트 `pyproject.toml`이 UV 워크스페이스를 정의하므로 로컬과 CI 모두 같은 방식으로 `apps/api`, `pipeline`, `packages/ontology`를 함께 동기화합니다. 기존처럼 `make setup`을 써도 같은 워크스페이스 `uv sync`가 실행됩니다.
 
 ## 선거 일정 (2026)
 
