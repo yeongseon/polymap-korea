@@ -1,0 +1,397 @@
+{
+  "details": [
+    {
+      "id": "candidacy-kim-minsu",
+      "person_id": "person-kim-minsu",
+      "race_id": "race-seoul-mayor-2026",
+      "party_id": "party-democratic",
+      "status": "registered",
+      "registered_at": "2026-02-14T10:00:00+09:00",
+      "candidate_number": 1,
+      "created_at": "2026-02-14T10:00:00+09:00",
+      "updated_at": "2026-04-01T09:00:00+09:00",
+      "person": {
+        "id": "person-kim-minsu",
+        "name_ko": "김민수",
+        "name_en": "Kim Min-su",
+        "photo_url": null
+      },
+      "party": {
+        "id": "party-democratic",
+        "name_ko": "더불어민주당",
+        "abbreviation": "민주",
+        "color_hex": "#1d70b8"
+      },
+      "promises": [
+        {
+          "id": "promise-kim-jobs",
+          "candidacy_id": "candidacy-kim-minsu",
+          "title": "청년·경력전환자를 위한 서울형 미래일자리 5만 개 조성",
+          "body": "캠퍼스타운, 공공데이터, 바이오·콘텐츠 산업을 연계한 직무 전환 프로그램을 운영하고 서울형 채용 연계 인턴십을 확대합니다.",
+          "category": "일자리",
+          "issue_id": "issue-economy-jobs",
+          "source_doc_id": "doc-kim-policy-001",
+          "sort_order": 1,
+          "created_at": "2026-02-20T09:00:00+09:00",
+          "updated_at": "2026-04-01T09:00:00+09:00"
+        },
+        {
+          "id": "promise-kim-budget",
+          "candidacy_id": "candidacy-kim-minsu",
+          "title": "동네 단위 참여예산 2배 확대와 예산집행 공개 대시보드 구축",
+          "body": "주민참여예산 신청부터 집행까지 과정을 실시간 공개하고, 생활SOC 예산은 동 단위로 편성 내역을 제공합니다.",
+          "category": "행정·자치",
+          "issue_id": "issue-administration",
+          "source_doc_id": "doc-kim-policy-002",
+          "sort_order": 2,
+          "created_at": "2026-02-21T09:00:00+09:00",
+          "updated_at": "2026-04-01T09:00:00+09:00"
+        }
+      ],
+      "claims": [
+        {
+          "id": "claim-kim-transit",
+          "candidacy_id": "candidacy-kim-minsu",
+          "source_doc_id": "doc-kim-interview-101",
+          "claim_type": "official_fact",
+          "content": "김민수 후보는 서울시 부시장 재직 시절 심야버스 노선 조정을 주도했다고 주장했습니다.",
+          "excerpt": "심야버스 배차 체계를 손본 경험을 바탕으로 교통복지를 확대하겠습니다.",
+          "created_at": "2026-03-04T09:30:00+09:00",
+          "updated_at": "2026-04-01T09:00:00+09:00"
+        }
+      ]
+    },
+    {
+      "id": "candidacy-lee-jieun",
+      "person_id": "person-lee-jieun",
+      "race_id": "race-seoul-mayor-2026",
+      "party_id": "party-ppp",
+      "status": "registered",
+      "registered_at": "2026-02-14T10:30:00+09:00",
+      "candidate_number": 2,
+      "created_at": "2026-02-14T10:30:00+09:00",
+      "updated_at": "2026-04-01T09:00:00+09:00",
+      "person": {
+        "id": "person-lee-jieun",
+        "name_ko": "이지은",
+        "name_en": "Lee Ji-eun",
+        "photo_url": null
+      },
+      "party": {
+        "id": "party-ppp",
+        "name_ko": "국민의힘",
+        "abbreviation": "국힘",
+        "color_hex": "#e61e2b"
+      },
+      "promises": [
+        {
+          "id": "promise-lee-finance",
+          "candidacy_id": "candidacy-lee-jieun",
+          "title": "창업·재도전 기업을 위한 서울 혁신금융 허브 조성",
+          "body": "마포·용산·성수 권역을 연결하는 민관 합동 펀드를 만들고, 실패 기업 재도전 전용 보증 프로그램을 확대합니다.",
+          "category": "경제",
+          "issue_id": "issue-economy",
+          "source_doc_id": "doc-lee-policy-001",
+          "sort_order": 1,
+          "created_at": "2026-02-20T10:00:00+09:00",
+          "updated_at": "2026-04-01T09:00:00+09:00"
+        },
+        {
+          "id": "promise-lee-transport",
+          "candidacy_id": "candidacy-lee-jieun",
+          "title": "심야버스 증편과 환승거점형 GTX 연계 버스 도입",
+          "body": "출퇴근 혼잡시간 맞춤형 급행버스와 심야버스 증편으로 생활권 이동시간을 평균 15분 줄이겠습니다.",
+          "category": "대중교통",
+          "issue_id": "issue-transport-public",
+          "source_doc_id": "doc-lee-policy-002",
+          "sort_order": 2,
+          "created_at": "2026-02-22T11:00:00+09:00",
+          "updated_at": "2026-04-01T09:00:00+09:00"
+        }
+      ],
+      "claims": [
+        {
+          "id": "claim-lee-budget",
+          "candidacy_id": "candidacy-lee-jieun",
+          "source_doc_id": "doc-lee-debate-201",
+          "claim_type": "sourced_claim",
+          "content": "이지은 후보는 취임 첫해 서울시 채무비율을 3%포인트 낮추겠다고 밝혔습니다.",
+          "excerpt": "재정건전성을 지키면서 필요한 투자만 선택적으로 집행하겠습니다.",
+          "created_at": "2026-03-12T20:00:00+09:00",
+          "updated_at": "2026-04-01T09:00:00+09:00"
+        }
+      ]
+    },
+    {
+      "id": "candidacy-han-doyun",
+      "person_id": "person-han-doyun",
+      "race_id": "race-seoul-mayor-2026",
+      "party_id": "party-justice",
+      "status": "registered",
+      "registered_at": "2026-02-15T09:00:00+09:00",
+      "candidate_number": 3,
+      "created_at": "2026-02-15T09:00:00+09:00",
+      "updated_at": "2026-04-01T09:00:00+09:00",
+      "person": {
+        "id": "person-han-doyun",
+        "name_ko": "한도윤",
+        "name_en": "Han Do-yun",
+        "photo_url": null
+      },
+      "party": {
+        "id": "party-justice",
+        "name_ko": "정의당",
+        "abbreviation": "정의",
+        "color_hex": "#ffcc00"
+      },
+      "promises": [
+        {
+          "id": "promise-han-platform",
+          "candidacy_id": "candidacy-han-doyun",
+          "title": "플랫폼 노동자 공제회 설립과 공정수수료 협약 추진",
+          "body": "배달·대리운전·프리랜서 노동자를 위한 상해보장과 소득안정 기금을 서울시가 지원합니다.",
+          "category": "일자리",
+          "issue_id": "issue-economy-jobs",
+          "source_doc_id": "doc-han-policy-001",
+          "sort_order": 1,
+          "created_at": "2026-02-24T10:00:00+09:00",
+          "updated_at": "2026-04-01T09:00:00+09:00"
+        },
+        {
+          "id": "promise-han-climate",
+          "candidacy_id": "candidacy-han-doyun",
+          "title": "공공건물 태양광 확대와 건물에너지 데이터 공개",
+          "body": "에너지 다소비 공공건물부터 태양광 설치와 단열 개선을 지원하고, 구별 탄소배출 데이터를 공개합니다.",
+          "category": "기후·에너지",
+          "issue_id": "issue-environment-climate",
+          "source_doc_id": "doc-han-policy-002",
+          "sort_order": 2,
+          "created_at": "2026-02-25T10:00:00+09:00",
+          "updated_at": "2026-04-01T09:00:00+09:00"
+        }
+      ],
+      "claims": [
+        {
+          "id": "claim-han-housing",
+          "candidacy_id": "candidacy-han-doyun",
+          "source_doc_id": "doc-han-briefing-301",
+          "claim_type": "opinion",
+          "content": "한도윤 후보는 서울의 기후정책이 주거·교통 정책과 함께 추진되지 않으면 효과가 반감된다고 지적했습니다.",
+          "excerpt": "기후위기 대책은 에너지 전환만이 아니라 일상 이동과 주거비 부담 완화까지 포함해야 합니다.",
+          "created_at": "2026-03-18T09:00:00+09:00",
+          "updated_at": "2026-04-01T09:00:00+09:00"
+        }
+      ]
+    },
+    {
+      "id": "candidacy-park-jungho",
+      "person_id": "person-park-jungho",
+      "race_id": "race-mapo-council-2026",
+      "party_id": "party-democratic",
+      "status": "registered",
+      "registered_at": "2026-02-18T09:00:00+09:00",
+      "candidate_number": 1,
+      "created_at": "2026-02-18T09:00:00+09:00",
+      "updated_at": "2026-04-01T09:00:00+09:00",
+      "person": {
+        "id": "person-park-jungho",
+        "name_ko": "박정호",
+        "name_en": "Park Jeong-ho",
+        "photo_url": null
+      },
+      "party": {
+        "id": "party-democratic",
+        "name_ko": "더불어민주당",
+        "abbreviation": "민주",
+        "color_hex": "#1d70b8"
+      },
+      "promises": [
+        {
+          "id": "promise-park-market",
+          "candidacy_id": "candidacy-park-jungho",
+          "title": "합정·망원 골목상권 공공주차장과 배송거점 확충",
+          "body": "점심·저녁 시간대 불법주정차 문제를 줄이고, 소상공인 공동물류 거점을 만들어 배달비 부담을 낮춥니다.",
+          "category": "소상공인·자영업",
+          "issue_id": "issue-economy-smallbiz",
+          "source_doc_id": "doc-park-policy-001",
+          "sort_order": 1,
+          "created_at": "2026-02-26T09:00:00+09:00",
+          "updated_at": "2026-04-01T09:00:00+09:00"
+        },
+        {
+          "id": "promise-park-walk",
+          "candidacy_id": "candidacy-park-jungho",
+          "title": "홍대입구역~합정역 보행안전 특화거리 조성",
+          "body": "보행량이 많은 구간에 교차로 턱낮춤, 스마트횡단보도, 야간조명을 집중 설치합니다.",
+          "category": "대중교통",
+          "issue_id": "issue-transport-public",
+          "source_doc_id": "doc-park-policy-002",
+          "sort_order": 2,
+          "created_at": "2026-02-27T09:00:00+09:00",
+          "updated_at": "2026-04-01T09:00:00+09:00"
+        }
+      ],
+      "claims": [
+        {
+          "id": "claim-park-pedestrian",
+          "candidacy_id": "candidacy-park-jungho",
+          "source_doc_id": "doc-park-interview-401",
+          "claim_type": "official_fact",
+          "content": "박정호 후보는 마포구 주요 상권 보행사고 다발지점 12곳 개선 예산을 확보하겠다고 밝혔습니다.",
+          "excerpt": "아이와 관광객이 함께 걷는 거리부터 먼저 안전하게 만들겠습니다.",
+          "created_at": "2026-03-21T09:00:00+09:00",
+          "updated_at": "2026-04-01T09:00:00+09:00"
+        }
+      ]
+    },
+    {
+      "id": "candidacy-choi-seoyeon",
+      "person_id": "person-choi-seoyeon",
+      "race_id": "race-mapo-council-2026",
+      "party_id": "party-ppp",
+      "status": "registered",
+      "registered_at": "2026-02-18T09:10:00+09:00",
+      "candidate_number": 2,
+      "created_at": "2026-02-18T09:10:00+09:00",
+      "updated_at": "2026-04-01T09:00:00+09:00",
+      "person": {
+        "id": "person-choi-seoyeon",
+        "name_ko": "최서연",
+        "name_en": "Choi Seo-yeon",
+        "photo_url": null
+      },
+      "party": {
+        "id": "party-ppp",
+        "name_ko": "국민의힘",
+        "abbreviation": "국힘",
+        "color_hex": "#e61e2b"
+      },
+      "promises": [
+        {
+          "id": "promise-choi-childcare",
+          "candidacy_id": "candidacy-choi-seoyeon",
+          "title": "마포형 초등 저녁돌봄센터 3곳 신설",
+          "body": "맞벌이 가정을 위해 학교와 주민센터를 연계한 저녁돌봄센터를 설치하고 귀가동행 서비스를 지원합니다.",
+          "category": "보육·육아",
+          "issue_id": "issue-welfare-childcare",
+          "source_doc_id": "doc-choi-policy-001",
+          "sort_order": 1,
+          "created_at": "2026-02-28T09:00:00+09:00",
+          "updated_at": "2026-04-01T09:00:00+09:00"
+        },
+        {
+          "id": "promise-choi-safety",
+          "candidacy_id": "candidacy-choi-seoyeon",
+          "title": "어린이보호구역 AI 단속장비와 귀갓길 안심조명 확대",
+          "body": "학교 주변 야간 사각지대 조명을 늘리고, 통학로 위험구간에 AI 기반 속도단속을 도입합니다.",
+          "category": "행정·자치",
+          "issue_id": "issue-administration",
+          "source_doc_id": "doc-choi-policy-002",
+          "sort_order": 2,
+          "created_at": "2026-02-28T09:20:00+09:00",
+          "updated_at": "2026-04-01T09:00:00+09:00"
+        }
+      ],
+      "claims": [
+        {
+          "id": "claim-choi-parent",
+          "candidacy_id": "candidacy-choi-seoyeon",
+          "source_doc_id": "doc-choi-forum-501",
+          "claim_type": "sourced_claim",
+          "content": "최서연 후보는 마포구 초등 방과후 대기수요를 현재보다 절반 이하로 줄이겠다고 말했습니다.",
+          "excerpt": "아이를 맡길 곳이 없어 퇴근 시간을 조정하는 일이 없도록 하겠습니다.",
+          "created_at": "2026-03-22T18:00:00+09:00",
+          "updated_at": "2026-04-01T09:00:00+09:00"
+        }
+      ]
+    },
+    {
+      "id": "candidacy-yoon-gaon",
+      "person_id": "person-yoon-gaon",
+      "race_id": "race-seoul-superintendent-2026",
+      "party_id": null,
+      "status": "registered",
+      "registered_at": "2026-02-19T09:00:00+09:00",
+      "candidate_number": 1,
+      "created_at": "2026-02-19T09:00:00+09:00",
+      "updated_at": "2026-04-01T09:00:00+09:00",
+      "person": {
+        "id": "person-yoon-gaon",
+        "name_ko": "윤가온",
+        "name_en": "Yoon Ga-on",
+        "photo_url": null
+      },
+      "party": null,
+      "promises": [
+        {
+          "id": "promise-yoon-school",
+          "candidacy_id": "candidacy-yoon-gaon",
+          "title": "기초학력 책임지도와 학습회복 튜터 1천 명 배치",
+          "body": "초3·중1 전환기 학생에게 개별 튜터를 매칭하고, 학습격차가 큰 학교에 집중 지원팀을 배치합니다.",
+          "category": "교육",
+          "issue_id": "issue-welfare-childcare",
+          "source_doc_id": "doc-yoon-policy-001",
+          "sort_order": 1,
+          "created_at": "2026-03-01T09:00:00+09:00",
+          "updated_at": "2026-04-01T09:00:00+09:00"
+        }
+      ],
+      "claims": [
+        {
+          "id": "claim-yoon-class",
+          "candidacy_id": "candidacy-yoon-gaon",
+          "source_doc_id": "doc-yoon-debate-601",
+          "claim_type": "opinion",
+          "content": "윤가온 후보는 고교학점제 안착을 위해 교사 1인당 행정업무를 절반으로 줄여야 한다고 주장했습니다.",
+          "excerpt": "교사가 행정 대신 수업과 상담에 집중할 수 있어야 제도가 살아납니다.",
+          "created_at": "2026-03-25T20:00:00+09:00",
+          "updated_at": "2026-04-01T09:00:00+09:00"
+        }
+      ]
+    },
+    {
+      "id": "candidacy-oh-harin",
+      "person_id": "person-oh-harin",
+      "race_id": "race-seoul-superintendent-2026",
+      "party_id": null,
+      "status": "registered",
+      "registered_at": "2026-02-19T09:15:00+09:00",
+      "candidate_number": 2,
+      "created_at": "2026-02-19T09:15:00+09:00",
+      "updated_at": "2026-04-01T09:00:00+09:00",
+      "person": {
+        "id": "person-oh-harin",
+        "name_ko": "오하린",
+        "name_en": "Oh Ha-rin",
+        "photo_url": null
+      },
+      "party": null,
+      "promises": [
+        {
+          "id": "promise-oh-ai-learning",
+          "candidacy_id": "candidacy-oh-harin",
+          "title": "AI 학습진단 기반 기초학력·돌봄 연계 시스템 도입",
+          "body": "학습진단 결과를 바탕으로 방과후 돌봄과 연계한 맞춤형 보충수업을 제공하고, 학부모 상담 알림을 자동화합니다.",
+          "category": "보육·육아",
+          "issue_id": "issue-welfare-childcare",
+          "source_doc_id": "doc-oh-policy-001",
+          "sort_order": 1,
+          "created_at": "2026-03-01T10:00:00+09:00",
+          "updated_at": "2026-04-01T09:00:00+09:00"
+        }
+      ],
+      "claims": [
+        {
+          "id": "claim-oh-data",
+          "candidacy_id": "candidacy-oh-harin",
+          "source_doc_id": "doc-oh-briefing-701",
+          "claim_type": "ai_summary",
+          "content": "오하린 후보는 데이터 기반 학습지원이 지역 간 교육격차를 줄일 수 있다고 강조했습니다.",
+          "excerpt": "학교 현장의 데이터를 돌봄과 상담까지 연결해야 학생 맞춤 지원이 가능합니다.",
+          "created_at": "2026-03-28T09:00:00+09:00",
+          "updated_at": "2026-04-01T09:00:00+09:00"
+        }
+      ]
+    }
+  ]
+}

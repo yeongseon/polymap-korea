@@ -1,0 +1,93 @@
+[
+  {
+    "id": "person-kim-minsu",
+    "name_ko": "김민수",
+    "name_en": "Kim Min-su",
+    "photo_url": null,
+    "birth_date": "1974-02-14",
+    "gender": "male",
+    "bio": "전 서울시 부시장 출신으로 주거와 일자리 정책을 강조하는 가상의 후보입니다.",
+    "external_ids": {},
+    "created_at": "2025-12-15T09:00:00+09:00",
+    "updated_at": "2026-04-01T09:00:00+09:00",
+    "deleted_at": null
+  },
+  {
+    "id": "person-lee-jieun",
+    "name_ko": "이지은",
+    "name_en": "Lee Ji-eun",
+    "photo_url": null,
+    "birth_date": "1980-08-22",
+    "gender": "female",
+    "bio": "도시 재정 건전성과 교통 인프라 혁신을 내세우는 가상의 후보입니다.",
+    "external_ids": {},
+    "created_at": "2025-12-15T09:00:00+09:00",
+    "updated_at": "2026-04-01T09:00:00+09:00",
+    "deleted_at": null
+  },
+  {
+    "id": "person-han-doyun",
+    "name_ko": "한도윤",
+    "name_en": "Han Do-yun",
+    "photo_url": null,
+    "birth_date": "1986-11-03",
+    "gender": "male",
+    "bio": "기후위기 대응과 플랫폼 노동 보호를 중심으로 활동한 가상의 청년 정치인입니다.",
+    "external_ids": {},
+    "created_at": "2025-12-15T09:00:00+09:00",
+    "updated_at": "2026-04-01T09:00:00+09:00",
+    "deleted_at": null
+  },
+  {
+    "id": "person-park-jungho",
+    "name_ko": "박정호",
+    "name_en": "Park Jeong-ho",
+    "photo_url": null,
+    "birth_date": "1978-06-19",
+    "gender": "male",
+    "bio": "마포구 도시재생위원회 활동 경력을 가진 가상의 구의원 후보입니다.",
+    "external_ids": {},
+    "created_at": "2025-12-15T09:00:00+09:00",
+    "updated_at": "2026-04-01T09:00:00+09:00",
+    "deleted_at": null
+  },
+  {
+    "id": "person-choi-seoyeon",
+    "name_ko": "최서연",
+    "name_en": "Choi Seo-yeon",
+    "photo_url": null,
+    "birth_date": "1988-04-07",
+    "gender": "female",
+    "bio": "학부모 간담회와 생활안전 예산 감시 활동으로 알려진 가상의 후보입니다.",
+    "external_ids": {},
+    "created_at": "2025-12-15T09:00:00+09:00",
+    "updated_at": "2026-04-01T09:00:00+09:00",
+    "deleted_at": null
+  },
+  {
+    "id": "person-yoon-gaon",
+    "name_ko": "윤가온",
+    "name_en": "Yoon Ga-on",
+    "photo_url": null,
+    "birth_date": "1971-09-28",
+    "gender": "female",
+    "bio": "혁신학교와 기초학력 지원 정책을 연구한 가상의 교육감 후보입니다.",
+    "external_ids": {},
+    "created_at": "2025-12-15T09:00:00+09:00",
+    "updated_at": "2026-04-01T09:00:00+09:00",
+    "deleted_at": null
+  },
+  {
+    "id": "person-oh-harin",
+    "name_ko": "오하린",
+    "name_en": "Oh Ha-rin",
+    "photo_url": null,
+    "birth_date": "1975-01-11",
+    "gender": "female",
+    "bio": "AI 기반 학습지원과 돌봄 연계형 학교 모델을 제시하는 가상의 교육감 후보입니다.",
+    "external_ids": {},
+    "created_at": "2025-12-15T09:00:00+09:00",
+    "updated_at": "2026-04-01T09:00:00+09:00",
+    "deleted_at": null
+  }
+]
