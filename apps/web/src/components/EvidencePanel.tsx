@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getSource } from "@/lib/api";
-import type { ClaimRead, PromiseRead } from "@/lib/types";
+import type { ClaimRead, PromiseRead, SourceDocRead } from "@/lib/types";
 
 interface EvidencePanelProps {
   claim?: ClaimRead;
@@ -102,14 +102,7 @@ function SourceDetails({
   hasRequestedSources: boolean;
   isError: boolean;
   isLoading: boolean;
-  sources: Array<{
-    id: string;
-    title: string;
-    url: string | null;
-    publisher: string;
-    published_at: string | null;
-    doc_type: string;
-  }>;
+  sources: SourceDocRead[];
 }) {
   return (
     <section className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
@@ -150,7 +143,7 @@ function SourceDetails({
           {sources.map((source) => (
             <li key={source.id} className="rounded-xl bg-white p-3 shadow-sm ring-1 ring-slate-200">
               <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
-                {source.doc_type}
+                {source.kind}
               </p>
               {source.url ? (
                 <a
@@ -165,7 +158,8 @@ function SourceDetails({
                 <p className="mt-1 text-sm font-semibold text-slate-900">{source.title}</p>
               )}
               <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-500">
-                <span>{source.publisher}</span>
+                <span>{source.kind}</span>
+                {source.is_poll_result && <span>여론조사</span>}
                 {source.published_at && (
                   <span>{new Date(source.published_at).toLocaleDateString("ko-KR")}</span>
                 )}

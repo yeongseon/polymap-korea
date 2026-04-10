@@ -4,6 +4,7 @@ import type {
   CandidacySummary,
   ClaimRead,
   ComparisonResult,
+  ComparisonResultAPI,
   DistrictRead,
   ElectionDetail,
   ElectionSummary,
@@ -352,6 +353,7 @@ export function compareCandidacies(ids: string[]): Promise<ComparisonResult> {
 }
 
 export function getCompareBundle(ids: string[]): Promise<CompareBundle> {
+  // Demo mode returns `ComparisonResult` with record-shaped `by_issue`; the real API would return `ComparisonResultAPI`.
   return buildCompareBundle(ids);
 }
 
