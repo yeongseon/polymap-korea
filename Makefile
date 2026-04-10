@@ -1,5 +1,7 @@
 .PHONY: help setup dev-infra api web pipeline lint test
 
+UV_SYNC=uv sync --all-extras --package polymap-api --package polymap-pipeline
+
 help:
 	@echo "폴리맵 코리아 개발 명령어"
 	@echo ""
@@ -12,8 +14,7 @@ help:
 	@echo "  make test         - 전체 테스트 실행"
 
 setup:
-	cd apps/api && uv sync --all-extras
-	cd pipeline && uv sync --all-extras
+	$(UV_SYNC)
 	pnpm install
 
 dev-infra:
@@ -32,17 +33,21 @@ web:
 	cd apps/web && pnpm dev
 
 lint:
+	$(UV_SYNC)
 	cd apps/api && uv run ruff check src/ tests/
 	cd pipeline && uv run ruff check .
 	cd apps/web && pnpm lint
 
 test:
+	$(UV_SYNC)
 	cd apps/api && uv run pytest
 	cd pipeline && uv run pytest
 
 test-api:
+	$(UV_SYNC)
 	cd apps/api && uv run pytest -v
 
 format:
+	$(UV_SYNC)
 	cd apps/api && uv run ruff format src/ tests/
 	cd pipeline && uv run ruff format .

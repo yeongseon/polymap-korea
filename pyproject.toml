@@ -1,0 +1,5 @@
+[tool.uv.workspace]
+members = ["apps/api", "pipeline", "packages/ontology"]
+
+[tool.uv.sources]
+polymap-ontology = { workspace = true }

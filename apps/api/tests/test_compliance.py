@@ -12,6 +12,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from polymap_api.middleware.content_guard import ensure_content_visible, is_content_blocked
+from polymap_api.config import settings
 from polymap_api.models import AuditLog, ElectionWindow, SourceDoc
 from polymap_api.services.expiry import expire_source_docs
 from polymap_ontology.enums import SourceDocKind
@@ -76,7 +77,7 @@ async def test_audit_log_creation_and_append_only_guard(
 ) -> None:
     response = await client.post(
         "/api/v1/compliance/audit-log",
-        headers={"X-Admin-Role": "admin"},
+        headers={"Authorization": f"Bearer {settings.admin_api_key}"},
         json={
             "actor": "admin-user",
             "action": "REVIEW",
@@ -105,6 +106,34 @@ async def test_audit_log_creation_and_append_only_guard(
     with pytest.raises(ValueError, match="append-only"):
         await db_session.commit()
     await db_session.rollback()
+
+
+@pytest.mark.asyncio
+async def test_audit_log_creation_requires_admin_bearer_token(
+    client: AsyncClient,
+    seeded_db: dict[str, object],
+) -> None:
+    payload = {
+        "actor": "admin-user",
+        "action": "REVIEW",
+        "entity_type": "source_doc",
+        "entity_id": str(seeded_db["source_doc"]),
+        "reason_code": "LEGAL_CHECK",
+        "new_value": {"visibility": "VISIBLE"},
+        "legal_basis": "ELECTION_COMPLIANCE",
+    }
+
+    missing_response = await client.post("/api/v1/compliance/audit-log", json=payload)
+    wrong_response = await client.post(
+        "/api/v1/compliance/audit-log",
+        headers={"Authorization": "Bearer wrong-key"},
+        json=payload,
+    )
+
+    assert missing_response.status_code == 401
+    assert missing_response.json()["detail"] == "Admin authentication required"
+    assert wrong_response.status_code == 403
+    assert wrong_response.json()["detail"] == "Invalid admin API key"
 
 
 @pytest.mark.asyncio
@@ -172,7 +201,7 @@ async def test_candidacy_detail_strips_claims_during_blackout(
     response = await client.get(f"/api/v1/candidacies/{candidacy_id}")
 
     assert response.status_code == 200
-    assert response.json()["claims"] == []
+    assert [claim["content"] for claim in response.json()["claims"]] == ["Will add new subway lines."]
 
 
 @pytest.mark.asyncio

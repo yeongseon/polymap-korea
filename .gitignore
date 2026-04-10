@@ -1,13 +1,17 @@
 # Node / pnpm
 node_modules/
+.next/
+out/
 .pnpm-store/
 apps/web/.next/
 apps/web/out/
 apps/web/coverage/
+*.tsbuildinfo
 
 # Python
 __pycache__/
 *.py[cod]
+*.pyc
 *.pyo
 *.pyd
 .pytest_cache/

@@ -3,6 +3,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   getCandidacies,
+  getCompareBundle,
   getCandidacy,
   getCandidacyClaims,
   getCandidacyPromises,
@@ -112,5 +113,15 @@ export function useSearch(q: string, type?: string) {
     queryKey: ["search", q, type],
     queryFn: () => search(q, type),
     enabled: q.length > 0,
+  });
+}
+
+export function useCompare(ids: string[]) {
+  const normalizedIds = Array.from(new Set(ids.filter(Boolean))).slice(0, 4);
+
+  return useQuery({
+    queryKey: ["compare", normalizedIds],
+    queryFn: () => getCompareBundle(normalizedIds),
+    enabled: normalizedIds.length >= 2,
   });
 }

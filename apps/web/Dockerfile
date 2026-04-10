@@ -18,19 +18,21 @@ RUN npm install -g pnpm@9
 COPY --from=deps /app/ ./
 COPY apps/web ./apps/web
 
-RUN pnpm --filter web build
+RUN pnpm --filter web exec next build --no-lint
 
-FROM node:20-alpine AS runner
+FROM nginx:1.27-alpine AS runner
 
-WORKDIR /app
-
-ENV NODE_ENV=production \
-    PORT=3000 \
-    HOSTNAME=0.0.0.0
-
-COPY --from=builder /app/apps/web/.next/standalone ./
-COPY --from=builder /app/apps/web/.next/static ./.next/static
+COPY --from=builder /app/apps/web/out /usr/share/nginx/html
+COPY <<'NGINX_CONF' /etc/nginx/conf.d/default.conf
+server {
+    listen 3000;
+    root /usr/share/nginx/html;
+    location / {
+        try_files $uri $uri/ $uri.html /index.html;
+    }
+}
+NGINX_CONF
 
 EXPOSE 3000
 
-CMD ["node", "server.js"]
+CMD ["nginx", "-g", "daemon off;"]

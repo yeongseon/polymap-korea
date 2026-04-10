@@ -15,6 +15,7 @@ class ClaimBase(BaseModel):
     candidacy_id: UUID
     source_doc_id: UUID
     claim_type: ClaimType
+    is_legally_restricted: bool = False
     content: str = Field(min_length=1)
     excerpt: str | None = None
 
@@ -27,6 +28,7 @@ class ClaimUpdate(ClaimBase):
     candidacy_id: UUID | None = None
     source_doc_id: UUID | None = None
     claim_type: ClaimType | None = None
+    is_legally_restricted: bool | None = None
     content: str | None = None
     excerpt: str | None = None
 

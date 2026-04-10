@@ -152,11 +152,43 @@ export interface SourceDocRead {
   title: string;
   url: string | null;
   published_at: string | null;
+  is_poll_result: boolean;
   content_hash: string | null;
   raw_s3_key: string | null;
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
+}
+
+// Demo compare data is keyed by issue ID for easier client-side rendering.
+// The real API contract returns `by_issue` as a list; see ComparisonResultAPI below.
+export interface ComparisonIssuePositions {
+  issue_name: string;
+  positions: Array<{
+    candidacy_id: UUID;
+    promises: PromiseRead[];
+  }>;
+}
+
+export interface ComparisonResult {
+  candidacy_ids: UUID[];
+  by_issue: Record<string, ComparisonIssuePositions>;
+}
+
+export interface ComparisonByIssueAPI {
+  issue_id: UUID | null;
+  issue_name: string | null;
+  candidates: Array<{
+    candidacy_id: UUID;
+    person_name: string;
+    party_name: string | null;
+    promises: PromiseRead[];
+  }>;
+}
+
+export interface ComparisonResultAPI {
+  candidacy_ids: UUID[];
+  by_issue: ComparisonByIssueAPI[];
 }
 
 export interface SearchResponse {

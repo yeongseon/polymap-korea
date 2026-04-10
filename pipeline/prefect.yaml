@@ -6,9 +6,9 @@ push: []
 pull: []
 
 deployments:
-  - name: nec-snapshot
+  - name: curated-publish
     version: 0.1.0
-    description: Capture raw NEC source snapshots.
+    description: Write curated JSON snapshots and, when API_URL is configured, post them to the API for database indexing. OpenSearch wiring is planned but not active yet.
     entrypoint: flows/publish.py:publish_snapshot
     work_pool:
       name: polymap-pool

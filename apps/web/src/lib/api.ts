@@ -3,6 +3,8 @@ import type {
   CandidacyDetail,
   CandidacySummary,
   ClaimRead,
+  ComparisonResult,
+  ComparisonResultAPI,
   DistrictRead,
   ElectionDetail,
   ElectionSummary,
@@ -14,6 +16,7 @@ import type {
   PromiseRead,
   RaceRead,
   SearchResponse,
+  SourceDocRead,
 } from "@/lib/types";
 
 const BASE_PATH = "/polymap-korea";
@@ -30,6 +33,11 @@ type DemoCandidaciesData = {
 type DemoIssuesData = {
   tree: IssueTreeNode[];
   details: IssueDetail[];
+};
+
+type CompareBundle = {
+  candidacies: CandidacyDetail[];
+  comparison: ComparisonResult;
 };
 
 type BallotResolveEntry = {
@@ -77,6 +85,10 @@ async function getPersonsData() {
   return demoFetch<PersonRead[]>("persons.json");
 }
 
+async function getSourcesData() {
+  return demoFetch<SourceDocRead[]>("sources.json");
+}
+
 async function getDistrictsData() {
   return demoFetch<DistrictRead[]>("districts.json");
 }
@@ -101,6 +113,78 @@ async function getPartyIndex() {
 async function getRaceIndex() {
   const { details } = await getElectionsData();
   return new Map(details.flatMap((election) => election.races.map((race) => [race.id, race])));
+}
+
+function compareIssueKey(issueId: string | null) {
+  return issueId ?? "unassigned";
+}
+
+async function buildCompareBundle(ids: string[]): Promise<CompareBundle> {
+  const uniqueIds = Array.from(new Set(ids.filter(Boolean))).slice(0, 4);
+
+  if (uniqueIds.length < 2) {
+    throw new Error("비교하려면 후보 2명 이상이 필요합니다.");
+  }
+
+  const [candidaciesData, issuesData] = await Promise.all([
+    getCandidaciesData(),
+    getIssuesData(),
+  ]);
+
+  const candidacyIndex = new Map(
+    candidaciesData.details.map((candidacy) => [candidacy.id, candidacy])
+  );
+  const candidacies = uniqueIds.map((id) =>
+    ensureFound(candidacyIndex.get(id), "후보 정보를 찾을 수 없습니다")
+  );
+  const issueNameById = new Map(
+    issuesData.details.map((issue) => [issue.id, issue.name])
+  );
+  const groupedPromises = new Map<string, Record<string, PromiseRead[]>>();
+
+  for (const candidacy of candidacies) {
+    for (const promise of candidacy.promises) {
+      const issueKey = compareIssueKey(promise.issue_id);
+      const issuePromises = groupedPromises.get(issueKey) ?? {};
+      const existingPromises = issuePromises[candidacy.id] ?? [];
+
+      issuePromises[candidacy.id] = [...existingPromises, promise].sort(
+        (left, right) => left.sort_order - right.sort_order
+      );
+      groupedPromises.set(issueKey, issuePromises);
+    }
+  }
+
+  const orderedIssues = Array.from(groupedPromises.keys()).sort((left, right) => {
+    if (left === "unassigned") return 1;
+    if (right === "unassigned") return -1;
+
+    return (issueNameById.get(left) ?? "").localeCompare(issueNameById.get(right) ?? "", "ko");
+  });
+
+  const by_issue = Object.fromEntries(
+    orderedIssues.map((issueKey) => [
+      issueKey,
+      {
+        issue_name:
+          issueKey === "unassigned"
+            ? "기타"
+            : issueNameById.get(issueKey) ?? "이슈 미분류",
+        positions: candidacies.map((candidacy) => ({
+          candidacy_id: candidacy.id,
+          promises: groupedPromises.get(issueKey)?.[candidacy.id] ?? [],
+        })),
+      },
+    ])
+  );
+
+  return {
+    candidacies,
+    comparison: {
+      candidacy_ids: candidacies.map((candidacy) => candidacy.id),
+      by_issue,
+    },
+  };
 }
 
 export function resolveBallot(addressText: string): Promise<BallotResolveResponse> {
@@ -133,6 +217,12 @@ export function getElection(id: string): Promise<ElectionDetail> {
 export function getCandidacy(id: string): Promise<CandidacyDetail> {
   return getCandidaciesData().then((data) =>
     ensureFound(data.details.find((candidacy) => candidacy.id === id), "후보 정보를 찾을 수 없습니다")
+  );
+}
+
+export function getSource(id: string): Promise<SourceDocRead> {
+  return getSourcesData().then((sources) =>
+    ensureFound(sources.find((source) => source.id === id), "출처 문서를 찾을 수 없습니다")
   );
 }
 
@@ -256,6 +346,15 @@ export function getCandidacyPromises(id: string): Promise<PromiseRead[]> {
 
 export function getCandidacyClaims(id: string): Promise<ClaimRead[]> {
   return getCandidacy(id).then((candidacy) => candidacy.claims);
+}
+
+export function compareCandidacies(ids: string[]): Promise<ComparisonResult> {
+  return buildCompareBundle(ids).then((bundle) => bundle.comparison);
+}
+
+export function getCompareBundle(ids: string[]): Promise<CompareBundle> {
+  // Demo mode returns `ComparisonResult` with record-shaped `by_issue`; the real API would return `ComparisonResultAPI`.
+  return buildCompareBundle(ids);
 }
 
 export function getCandidaciesByDistrict(

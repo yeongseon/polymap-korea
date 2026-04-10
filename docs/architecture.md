@@ -15,8 +15,9 @@ Issue #1 establishes the v1 monorepo foundation for a Korean local election vote
    - Infrastructure services run via Compose profiles for local and CI-friendly development.
 
 3. **FastAPI OpenAPI as contract source of truth**
-   - `packages/contracts` stores generated TypeScript artifacts from the backend schema.
-   - API contracts flow from backend definitions, not a separate schema package.
+    - `packages/contracts` stores generated TypeScript artifacts from the backend schema.
+    - API contracts flow from backend definitions, not a separate schema package.
+    - The demo-mode web app currently keeps handwritten compatibility types in `apps/web/src/lib/types.ts`, but generation infrastructure now lives beside the frontend so drift can be reduced immediately.
 
 4. **Language-specific shared code**
    - Shared Python utilities live in `pipeline/common`.
@@ -42,6 +43,20 @@ Issue #1 establishes the v1 monorepo foundation for a Korean local election vote
 - `packages/ontology`: RDF/SHACL/JSON-LD assets
 - `pipeline`: source adapters, normalization, and publish flows
 - `infra/docker`: reserved for future Docker-related assets
+
+## Contract Generation Workflow
+
+- Backend OpenAPI remains the source of truth.
+- Frontend demo mode keeps handwritten adapter types in `apps/web/src/lib/types.ts` for now.
+- Generated frontend contracts are written to `apps/web/src/lib/generated-types.ts`.
+- From `apps/web`, run `pnpm generate:types` to execute `scripts/generate-types.sh`.
+- The script documents the local backend flow:
+
+  ```bash
+  curl http://localhost:8000/openapi.json | npx openapi-typescript - -o src/lib/generated-types.ts
+  ```
+
+- Once the demo adapters are removed, frontend API modules should import generated contracts directly from `generated-types.ts`.
 
 ## Compose Profiles
 

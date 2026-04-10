@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from sqlalchemy import Enum, ForeignKey, Index, Text, text
+from sqlalchemy import Boolean, Enum, ForeignKey, Index, Text, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from polymap_api.db import Base, TimestampMixin, UUIDPrimaryKeyMixin
@@ -36,6 +36,7 @@ class Claim(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         nullable=False,
     )
     claim_type: Mapped[ClaimType] = mapped_column(Enum(ClaimType, name="claim_type_enum"), nullable=False)
+    is_legally_restricted: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=text("false"))
     content: Mapped[str] = mapped_column(Text, nullable=False)
     excerpt: Mapped[str | None] = mapped_column(Text, nullable=True)
     extracted_at: Mapped[datetime | None] = mapped_column(nullable=True)

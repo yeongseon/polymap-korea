@@ -5,11 +5,11 @@ from datetime import datetime
 from uuid import UUID
 from zoneinfo import ZoneInfo
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from polymap_api.deps import get_db
+from polymap_api.deps import get_db, require_admin
 from polymap_api.middleware.content_guard import is_content_blocked
 from polymap_api.models import ElectionWindow
 from polymap_api.schemas.compliance import (
@@ -28,13 +28,6 @@ def _to_seoul(value: datetime) -> datetime:
     if value.tzinfo is None:
         return value.replace(tzinfo=SEOUL_TZ)
     return value.astimezone(SEOUL_TZ)
-
-
-async def require_admin_placeholder(
-    x_admin_role: str = Header(default="", alias="X-Admin-Role"),
-) -> None:
-    if x_admin_role.lower() != "admin":
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin access required")
 
 
 @router.get("/election-windows", response_model=list[ComplianceElectionWindowRead])
@@ -83,7 +76,7 @@ async def get_election_window_status(
 @router.post("/audit-log", response_model=ComplianceAuditLogRead, status_code=status.HTTP_201_CREATED)
 async def create_audit_log(
     payload: AuditLogCreate,
-    _: None = Depends(require_admin_placeholder),
+    _: None = Depends(require_admin),
     db: AsyncSession = Depends(get_db),
 ) -> ComplianceAuditLogRead:
     audit_log = await record_audit(db=db, **payload.model_dump())

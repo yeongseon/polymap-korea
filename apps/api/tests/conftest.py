@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import uuid
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Iterator
 from datetime import date, datetime, timezone
 
 import httpx
@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from sqlalchemy.pool import StaticPool
 
 from polymap_api.db import Base
+from polymap_api.config import settings
 from polymap_api.deps import get_db
 from polymap_api.main import app
 from polymap_api.models import (
@@ -65,6 +66,16 @@ def sample_ids() -> dict[str, uuid.UUID]:
         "race": uuid.uuid4(),
         "source_doc": uuid.uuid4(),
     }
+
+
+@pytest.fixture(autouse=True)
+def configure_admin_api_key() -> Iterator[str]:
+    original_key = settings.admin_api_key
+    settings.admin_api_key = "test-admin-key"
+    try:
+        yield settings.admin_api_key
+    finally:
+        settings.admin_api_key = original_key
 
 
 @pytest.fixture
@@ -127,6 +138,7 @@ def sample_instances(sample_ids: dict[str, uuid.UUID]) -> dict[str, object]:
         candidacy_id=sample_ids["candidacy"],
         source_doc_id=sample_ids["source_doc"],
         claim_type=ClaimType.SOURCED_CLAIM,
+        is_legally_restricted=False,
         content="Will add new subway lines.",
     )
     issue = Issue(
@@ -327,7 +339,16 @@ async def seeded_db(
         candidacy_id=sample_ids["candidacy"],
         source_doc_id=sample_ids["source_doc"],
         claim_type=ClaimType.SOURCED_CLAIM,
+        is_legally_restricted=False,
         content="Will add new subway lines.",
+    )
+    restricted_claim = Claim(
+        id=uuid.uuid4(),
+        candidacy_id=sample_ids["candidacy"],
+        source_doc_id=sample_ids["source_doc"],
+        claim_type=ClaimType.DISPUTED,
+        is_legally_restricted=True,
+        content="Polling lead widened to 10 points.",
     )
     committee_assignment = CommitteeAssignment(
         id=sample_ids["committee_assignment"],
@@ -359,6 +380,7 @@ async def seeded_db(
             issue,
             promise,
             claim,
+            restricted_claim,
             committee_assignment,
             bill_sponsorship,
         ]
