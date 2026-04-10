@@ -41,5 +41,8 @@ async def require_admin(
     if credentials is None or credentials.scheme.lower() != "bearer" or not credentials.credentials:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Admin authentication required")
 
+    if not settings.admin_api_key:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Admin API key not configured")
+
     if credentials.credentials != settings.admin_api_key:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid admin API key")

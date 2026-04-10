@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import uuid
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Iterator
 from datetime import date, datetime, timezone
 
 import httpx
@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from sqlalchemy.pool import StaticPool
 
 from polymap_api.db import Base
+from polymap_api.config import settings
 from polymap_api.deps import get_db
 from polymap_api.main import app
 from polymap_api.models import (
@@ -65,6 +66,16 @@ def sample_ids() -> dict[str, uuid.UUID]:
         "race": uuid.uuid4(),
         "source_doc": uuid.uuid4(),
     }
+
+
+@pytest.fixture(autouse=True)
+def configure_admin_api_key() -> Iterator[str]:
+    original_key = settings.admin_api_key
+    settings.admin_api_key = "test-admin-key"
+    try:
+        yield settings.admin_api_key
+    finally:
+        settings.admin_api_key = original_key
 
 
 @pytest.fixture

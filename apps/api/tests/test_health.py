@@ -3,7 +3,9 @@ from __future__ import annotations
 import pytest
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
+from sqlalchemy.exc import SQLAlchemyError
 
+from polymap_api.deps import get_db
 from polymap_api.main import app
 
 client = TestClient(app)
@@ -37,3 +39,22 @@ async def test_readiness_check_reports_database_connected(client: AsyncClient) -
 
     assert response.status_code == 200
     assert response.json() == {"status": "ok", "db": "connected"}
+
+
+@pytest.mark.asyncio
+async def test_readiness_check_hides_database_errors(client: AsyncClient) -> None:
+    class FailingSession:
+        async def execute(self, *_args: object, **_kwargs: object) -> None:
+            raise SQLAlchemyError("sensitive database details")
+
+    async def failing_get_db() -> object:
+        yield FailingSession()
+
+    app.dependency_overrides[get_db] = failing_get_db
+    try:
+        response = await client.get("/api/v1/health/ready")
+    finally:
+        app.dependency_overrides.clear()
+
+    assert response.status_code == 503
+    assert response.json() == {"status": "error", "db": "unavailable"}

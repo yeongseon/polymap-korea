@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:3000"])
     database_url: str = "postgresql+asyncpg://polymap:polymap_dev@localhost:5432/polymap"
     opensearch_url: str = "http://localhost:9200"
-    admin_api_key: str = "polymap-dev-admin-key-change-me"
+    admin_api_key: str = ""
     juso_api_key: str = ""
     s3_endpoint: str = "http://localhost:9000"
     s3_access_key: str = "polymap"

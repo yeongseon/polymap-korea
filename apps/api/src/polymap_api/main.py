@@ -1,6 +1,10 @@
 # ruff: noqa: E501,I001
 from __future__ import annotations
 
+import logging
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -10,12 +14,22 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from .config import settings
 from .deps import get_db
-from .routers import ballots, candidacies, compare, compliance, districts, elections, issues, persons, search, sources, sse
+from .routers import admin, ballots, candidacies, compare, compliance, districts, elections, issues, persons, search, sources, sse
+
+_logger = logging.getLogger("polymap_api")
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+    if not settings.admin_api_key:
+        _logger.warning("POLYMAP_ADMIN_API_KEY is not set — admin endpoints are effectively disabled")
+    yield
 
 app = FastAPI(
     title="PolyMap Korea API",
     description="2026 지방선거 유권자 정보 탐색 서비스 API",
     version="0.1.0",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -42,22 +56,16 @@ async def health_check() -> dict[str, str]:
 async def readiness_check(db: AsyncSession = Depends(get_db)) -> dict[str, str] | JSONResponse:
     try:
         await db.execute(text("SELECT 1"))
-    except Exception as exc:
+    except Exception:
         return JSONResponse(
             status_code=503,
-            content={
-                "status": "error",
-                "db": "unavailable",
-                "detail": str(exc),
-            },
+            content={"status": "error", "db": "unavailable"},
         )
 
     return {
         "status": "ok",
         "db": "connected",
     }
-
-
 app.include_router(elections.router, prefix="/api/v1")
 app.include_router(districts.router, prefix="/api/v1")
 app.include_router(persons.router, prefix="/api/v1")
@@ -69,3 +77,4 @@ app.include_router(search.router, prefix="/api/v1")
 app.include_router(compare.router, prefix="/api/v1")
 app.include_router(sse.router, prefix="/api/v1")
 app.include_router(compliance.router, prefix="/api/v1")
+app.include_router(admin.router, prefix="/api/v1")
