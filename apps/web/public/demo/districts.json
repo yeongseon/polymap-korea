@@ -1,0 +1,35 @@
+[
+  {
+    "id": "district-seoul",
+    "name_ko": "서울특별시",
+    "level": "metro",
+    "code": "11",
+    "name_en": "Seoul",
+    "parent_id": null,
+    "geometry": {
+      "type": "Feature",
+      "properties": {
+        "demo": true
+      }
+    },
+    "created_at": "2025-12-15T09:00:00+09:00",
+    "updated_at": "2026-04-01T09:00:00+09:00"
+  },
+  {
+    "id": "district-mapo",
+    "name_ko": "서울특별시 마포구",
+    "level": "district",
+    "code": "11440",
+    "name_en": "Mapo-gu, Seoul",
+    "parent_id": "district-seoul",
+    "geometry": {
+      "type": "Feature",
+      "properties": {
+        "demo": true,
+        "focus": "합정동·서교동"
+      }
+    },
+    "created_at": "2025-12-15T09:00:00+09:00",
+    "updated_at": "2026-04-01T09:00:00+09:00"
+  }
+]

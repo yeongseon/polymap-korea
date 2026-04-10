@@ -1,0 +1,117 @@
+{
+  "default_address": "서울특별시 마포구 합정동 371-9",
+  "responses": [
+    {
+      "address_keywords": ["마포", "합정", "서교", "연남"],
+      "response": {
+        "district": {
+          "id": "district-mapo",
+          "name_ko": "서울특별시 마포구",
+          "level": "district",
+          "code": "11440",
+          "name_en": "Mapo-gu, Seoul",
+          "parent_id": "district-seoul",
+          "geometry": {
+            "type": "Feature",
+            "properties": {
+              "demo": true,
+              "focus": "합정동·서교동"
+            }
+          },
+          "created_at": "2025-12-15T09:00:00+09:00",
+          "updated_at": "2026-04-01T09:00:00+09:00"
+        },
+        "races": [
+          {
+            "race": {
+              "id": "race-seoul-mayor-2026",
+              "election_id": "election-2026-local",
+              "district_id": "district-seoul",
+              "position_type": "mayor",
+              "seat_count": 1,
+              "created_at": "2025-12-15T09:00:00+09:00",
+              "updated_at": "2026-04-01T09:00:00+09:00"
+            },
+            "candidacies": [
+              {
+                "id": "candidacy-kim-minsu",
+                "person_id": "person-kim-minsu",
+                "race_id": "race-seoul-mayor-2026",
+                "status": "registered",
+                "candidate_number": 1
+              },
+              {
+                "id": "candidacy-lee-jieun",
+                "person_id": "person-lee-jieun",
+                "race_id": "race-seoul-mayor-2026",
+                "status": "registered",
+                "candidate_number": 2
+              },
+              {
+                "id": "candidacy-han-doyun",
+                "person_id": "person-han-doyun",
+                "race_id": "race-seoul-mayor-2026",
+                "status": "registered",
+                "candidate_number": 3
+              }
+            ]
+          },
+          {
+            "race": {
+              "id": "race-seoul-superintendent-2026",
+              "election_id": "election-2026-local",
+              "district_id": "district-seoul",
+              "position_type": "superintendent",
+              "seat_count": 1,
+              "created_at": "2025-12-15T09:00:00+09:00",
+              "updated_at": "2026-04-01T09:00:00+09:00"
+            },
+            "candidacies": [
+              {
+                "id": "candidacy-yoon-gaon",
+                "person_id": "person-yoon-gaon",
+                "race_id": "race-seoul-superintendent-2026",
+                "status": "registered",
+                "candidate_number": 1
+              },
+              {
+                "id": "candidacy-oh-harin",
+                "person_id": "person-oh-harin",
+                "race_id": "race-seoul-superintendent-2026",
+                "status": "registered",
+                "candidate_number": 2
+              }
+            ]
+          },
+          {
+            "race": {
+              "id": "race-mapo-council-2026",
+              "election_id": "election-2026-local",
+              "district_id": "district-mapo",
+              "position_type": "council_member",
+              "seat_count": 2,
+              "created_at": "2025-12-15T09:00:00+09:00",
+              "updated_at": "2026-04-01T09:00:00+09:00"
+            },
+            "candidacies": [
+              {
+                "id": "candidacy-park-jungho",
+                "person_id": "person-park-jungho",
+                "race_id": "race-mapo-council-2026",
+                "status": "registered",
+                "candidate_number": 1
+              },
+              {
+                "id": "candidacy-choi-seoyeon",
+                "person_id": "person-choi-seoyeon",
+                "race_id": "race-mapo-council-2026",
+                "status": "registered",
+                "candidate_number": 2
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

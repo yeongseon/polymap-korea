@@ -1,0 +1,48 @@
+{
+  "summaries": [
+    {
+      "id": "election-2026-local",
+      "name": "2026 지방선거",
+      "election_date": "2026-06-03"
+    }
+  ],
+  "details": [
+    {
+      "id": "election-2026-local",
+      "name": "2026 지방선거",
+      "election_date": "2026-06-03",
+      "election_type": "local",
+      "created_at": "2025-12-15T09:00:00+09:00",
+      "updated_at": "2026-04-01T09:00:00+09:00",
+      "races": [
+        {
+          "id": "race-seoul-mayor-2026",
+          "election_id": "election-2026-local",
+          "district_id": "district-seoul",
+          "position_type": "mayor",
+          "seat_count": 1,
+          "created_at": "2025-12-15T09:00:00+09:00",
+          "updated_at": "2026-04-01T09:00:00+09:00"
+        },
+        {
+          "id": "race-seoul-superintendent-2026",
+          "election_id": "election-2026-local",
+          "district_id": "district-seoul",
+          "position_type": "superintendent",
+          "seat_count": 1,
+          "created_at": "2025-12-15T09:00:00+09:00",
+          "updated_at": "2026-04-01T09:00:00+09:00"
+        },
+        {
+          "id": "race-mapo-council-2026",
+          "election_id": "election-2026-local",
+          "district_id": "district-mapo",
+          "position_type": "council_member",
+          "seat_count": 2,
+          "created_at": "2025-12-15T09:00:00+09:00",
+          "updated_at": "2026-04-01T09:00:00+09:00"
+        }
+      ]
+    }
+  ]
+}

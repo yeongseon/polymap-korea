@@ -1,14 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import type { IssueDetail } from "@/lib/types";
+import { useIssue } from "@/lib/hooks";
 
 export function IssueDetailClient({
-  issue,
+  issueId,
 }: {
-  issue: IssueDetail | null;
+  issueId: string;
 }) {
-  if (!issue) {
+  const { data: issue, isLoading, isError } = useIssue(issueId);
+
+  if (isLoading) {
+    return (
+      <div className="mx-auto max-w-3xl px-4 py-20 text-center">
+        <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+        <p className="mt-4 text-slate-500">이슈 정보를 불러오는 중…</p>
+      </div>
+    );
+  }
+
+  if (isError || !issue) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-20 text-center">
         <p className="text-4xl">😕</p>

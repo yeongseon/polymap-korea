@@ -3,27 +3,49 @@ import type {
   CandidacyDetail,
   CandidacySummary,
   ClaimRead,
+  DistrictRead,
   ElectionDetail,
   ElectionSummary,
   IssueDetail,
   IssueTreeNode,
+  PartySummary,
   PersonRead,
   PersonSummary,
   PromiseRead,
+  RaceRead,
   SearchResponse,
 } from "@/lib/types";
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
+const BASE_PATH = "/polymap-korea";
 
-const SERVER_BASE_URL =
-  process.env.API_URL_INTERNAL ?? BASE_URL;
+type DemoElectionsData = {
+  summaries: ElectionSummary[];
+  details: ElectionDetail[];
+};
 
-const ISR_REVALIDATE = 300;
+type DemoCandidaciesData = {
+  details: CandidacyDetail[];
+};
 
-async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}`, {
+type DemoIssuesData = {
+  tree: IssueTreeNode[];
+  details: IssueDetail[];
+};
+
+type BallotResolveEntry = {
+  address_keywords: string[];
+  response: BallotResolveResponse;
+};
+
+type DemoBallotResolveData = {
+  default_address: string;
+  responses: BallotResolveEntry[];
+};
+
+async function demoFetch<T>(path: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(`${BASE_PATH}/demo/${path}`, {
     headers: { "Content-Type": "application/json", ...init?.headers },
+    cache: "force-cache",
     ...init,
   });
   if (!res.ok) {
@@ -32,87 +54,234 @@ async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-async function serverFetch<T>(path: string): Promise<T> {
-  const res = await fetch(`${SERVER_BASE_URL}${path}`, {
-    headers: { "Content-Type": "application/json" },
-    next: { revalidate: ISR_REVALIDATE },
-  });
-  if (!res.ok) {
-    throw new Error(`요청을 처리할 수 없습니다 (${res.status})`);
+function ensureFound<T>(item: T | undefined, message: string): T {
+  if (!item) {
+    throw new Error(message);
   }
-  return res.json() as Promise<T>;
+  return item;
+}
+
+async function getElectionsData() {
+  return demoFetch<DemoElectionsData>("elections.json");
+}
+
+async function getCandidaciesData() {
+  return demoFetch<DemoCandidaciesData>("candidacies.json");
+}
+
+async function getIssuesData() {
+  return demoFetch<DemoIssuesData>("issues.json");
+}
+
+async function getPersonsData() {
+  return demoFetch<PersonRead[]>("persons.json");
+}
+
+async function getDistrictsData() {
+  return demoFetch<DistrictRead[]>("districts.json");
+}
+
+async function getBallotResolveData() {
+  return demoFetch<DemoBallotResolveData>("ballot-resolve.json");
+}
+
+async function getPartyIndex() {
+  const { details } = await getCandidaciesData();
+  const parties = new Map<string, PartySummary>();
+
+  for (const candidacy of details) {
+    if (candidacy.party) {
+      parties.set(candidacy.party.id, candidacy.party);
+    }
+  }
+
+  return Array.from(parties.values());
+}
+
+async function getRaceIndex() {
+  const { details } = await getElectionsData();
+  return new Map(details.flatMap((election) => election.races.map((race) => [race.id, race])));
 }
 
 export function resolveBallot(addressText: string): Promise<BallotResolveResponse> {
-  return apiFetch<BallotResolveResponse>("/ballots/resolve", {
-    method: "POST",
-    body: JSON.stringify({ address_text: addressText }),
+  return getBallotResolveData().then((data) => {
+    const normalized = addressText.replace(/\s+/g, "").toLowerCase();
+    const match = data.responses.find((entry) =>
+      entry.address_keywords.some((keyword) =>
+        normalized.includes(keyword.replace(/\s+/g, "").toLowerCase())
+      )
+    );
+
+    if (!match) {
+      throw new Error("데모 데이터에 등록된 서울특별시 마포구 주소를 입력해주세요.");
+    }
+
+    return match.response;
   });
 }
 
 export function getElections(): Promise<ElectionSummary[]> {
-  return apiFetch<ElectionSummary[]>("/elections");
+  return getElectionsData().then((data) => data.summaries);
 }
 
 export function getElection(id: string): Promise<ElectionDetail> {
-  return apiFetch<ElectionDetail>(`/elections/${id}`);
+  return getElectionsData().then((data) =>
+    ensureFound(data.details.find((election) => election.id === id), "선거 정보를 찾을 수 없습니다")
+  );
 }
 
 export function getCandidacy(id: string): Promise<CandidacyDetail> {
-  return apiFetch<CandidacyDetail>(`/candidacies/${id}`);
+  return getCandidaciesData().then((data) =>
+    ensureFound(data.details.find((candidacy) => candidacy.id === id), "후보 정보를 찾을 수 없습니다")
+  );
 }
 
 export function getCandidacies(
   params: Record<string, string | number>
 ): Promise<CandidacySummary[]> {
-  const qs = new URLSearchParams(
-    Object.entries(params).map(([k, v]) => [k, String(v)])
-  ).toString();
-  return apiFetch<CandidacySummary[]>(`/candidacies${qs ? `?${qs}` : ""}`);
+  return Promise.all([getCandidaciesData(), getRaceIndex()]).then(([data, raceIndex]) => {
+    const list = data.details.filter((candidacy) => {
+      const race = raceIndex.get(candidacy.race_id);
+      if (!race) return false;
+
+      return Object.entries(params).every(([key, value]) => {
+        const stringValue = String(value);
+
+        switch (key) {
+          case "district_id":
+            return race.district_id === stringValue;
+          case "race_id":
+            return candidacy.race_id === stringValue;
+          case "person_id":
+            return candidacy.person_id === stringValue;
+          case "status":
+            return candidacy.status === stringValue;
+          case "candidate_number":
+            return String(candidacy.candidate_number) === stringValue;
+          case "position_type":
+            return race.position_type === stringValue;
+          case "election_id":
+            return race.election_id === stringValue;
+          default:
+            return true;
+        }
+      });
+    });
+
+    return list.map(({ id, person_id, race_id, status, candidate_number }) => ({
+      id,
+      person_id,
+      race_id,
+      status,
+      candidate_number,
+    }));
+  });
 }
 
 export function getPersons(): Promise<PersonSummary[]> {
-  return apiFetch<PersonSummary[]>("/persons");
+  return getPersonsData().then((persons) =>
+    persons.map(({ id, name_ko, name_en, photo_url }) => ({
+      id,
+      name_ko,
+      name_en,
+      photo_url,
+    }))
+  );
 }
 
 export function getPerson(id: string): Promise<PersonRead> {
-  return apiFetch<PersonRead>(`/persons/${id}`);
+  return getPersonsData().then((persons) =>
+    ensureFound(persons.find((person) => person.id === id), "인물 정보를 찾을 수 없습니다")
+  );
 }
 
 export function getIssues(): Promise<IssueTreeNode[]> {
-  return apiFetch<IssueTreeNode[]>("/issues");
+  return getIssuesData().then((data) => data.tree);
 }
 
 export function getIssue(id: string): Promise<IssueDetail> {
-  return apiFetch<IssueDetail>(`/issues/${id}`);
+  return getIssuesData().then((data) =>
+    ensureFound(data.details.find((issue) => issue.id === id), "이슈 정보를 찾을 수 없습니다")
+  );
 }
 
 export function search(q: string, type?: string): Promise<SearchResponse> {
-  const params = new URLSearchParams({ q });
-  if (type) params.set("type", type);
-  return apiFetch<SearchResponse>(`/search?${params.toString()}`);
+  const keyword = q.trim().toLowerCase();
+
+  return Promise.all([getPersons(), getIssuesData(), getPartyIndex()]).then(
+    ([persons, issuesData, parties]) => {
+      const issueSummaries = issuesData.details.map(({ id, name, slug, parent_id }) => ({
+        id,
+        name,
+        slug,
+        parent_id,
+      }));
+
+      const matches = (values: Array<string | null | undefined>) =>
+        values.some((value) => value?.toLowerCase().includes(keyword));
+
+      const filteredPersons = keyword
+        ? persons.filter((person) => matches([person.name_ko, person.name_en]))
+        : [];
+      const filteredIssues = keyword
+        ? issueSummaries.filter((issue) => matches([issue.name, issue.slug]))
+        : [];
+      const filteredParties = keyword
+        ? parties.filter((party) => matches([party.name_ko, party.abbreviation]))
+        : [];
+
+      if (type === "persons") {
+        return { query: q, persons: filteredPersons, issues: [], parties: [] };
+      }
+      if (type === "issues") {
+        return { query: q, persons: [], issues: filteredIssues, parties: [] };
+      }
+      if (type === "parties") {
+        return { query: q, persons: [], issues: [], parties: filteredParties };
+      }
+
+      return {
+        query: q,
+        persons: filteredPersons,
+        issues: filteredIssues,
+        parties: filteredParties,
+      };
+    }
+  );
 }
 
 export function getCandidacyPromises(id: string): Promise<PromiseRead[]> {
-  return apiFetch<PromiseRead[]>(`/candidacies/${id}/promises`);
+  return getCandidacy(id).then((candidacy) => candidacy.promises);
 }
 
 export function getCandidacyClaims(id: string): Promise<ClaimRead[]> {
-  return apiFetch<ClaimRead[]>(`/candidacies/${id}/claims`);
+  return getCandidacy(id).then((candidacy) => candidacy.claims);
 }
 
 export function getCandidaciesByDistrict(
   districtId: string
 ): Promise<CandidacySummary[]> {
-  return apiFetch<CandidacySummary[]>(
-    `/candidacies?district_id=${districtId}`
-  );
+  return getCandidacies({ district_id: districtId });
 }
 
 export function getIssuesISR(): Promise<IssueTreeNode[]> {
-  return serverFetch<IssueTreeNode[]>("/issues");
+  return getIssues();
 }
 
 export function getIssueISR(id: string): Promise<IssueDetail> {
-  return serverFetch<IssueDetail>(`/issues/${id}`);
+  return getIssue(id);
+}
+
+export function getDistricts(): Promise<DistrictRead[]> {
+  return getDistrictsData();
+}
+
+export function getBallotByDistrict(districtId: string): Promise<BallotResolveResponse> {
+  return getBallotResolveData().then((data) => {
+    const match = data.responses.find(
+      (entry) => entry.response.district.id === districtId
+    );
+
+    return ensureFound(match?.response, "선거구 정보를 찾을 수 없습니다");
+  });
 }
