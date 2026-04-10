@@ -1,6 +1,8 @@
 # ruff: noqa: B008,TC002,TC003,E501
 from __future__ import annotations
 
+import importlib
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from sqlalchemy import select
@@ -10,6 +12,8 @@ from sqlalchemy.orm import selectinload
 from polymap_api.deps import get_db
 from polymap_api.models import District, Race
 from polymap_api.schemas import CandidacySummary, DistrictRead, RaceRead
+
+_GEOCODING = importlib.import_module("polymap_api.services.geocoding")
 
 router = APIRouter(prefix="/ballots", tags=["ballots"])
 
@@ -37,21 +41,6 @@ def _district_lineage(district: District, districts_by_id: dict) -> list[Distric
     return lineage
 
 
-def _pick_best_district(address_text: str, districts: list[District]) -> District | None:
-    district_list = list(districts)
-    districts_by_id = {district.id: district for district in district_list}
-    matched_districts = [district for district in district_list if district.name_ko in address_text]
-    if not matched_districts:
-        return None
-
-    def rank(district: District) -> tuple[int, int, int]:
-        lineage = _district_lineage(district, districts_by_id)
-        matching_ancestors = sum(1 for ancestor in lineage[1:] if ancestor.name_ko in address_text)
-        return (matching_ancestors, len(lineage), len(district.name_ko))
-
-    return max(matched_districts, key=rank)
-
-
 @router.post("/resolve", response_model=BallotResolveResponse)
 async def resolve_ballot(
     payload: BallotResolveRequest,
@@ -59,7 +48,7 @@ async def resolve_ballot(
 ) -> BallotResolveResponse:
     districts = list(await db.scalars(select(District)))
     normalized_address = payload.address_text.strip()
-    matched_district = _pick_best_district(normalized_address, districts)
+    matched_district = await _GEOCODING.build_address_resolver().resolve(normalized_address, districts)
     if matched_district is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="District could not be resolved")
 
